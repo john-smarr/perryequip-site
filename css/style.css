@@ -307,3 +307,111 @@ textarea{min-height:120px;resize:vertical}
   .contact-info h1{font-size:44px}
 }
 @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════
+   Sales Pages
+   ═══════════════════════════════════════════════════════ */
+
+/* Breadcrumb ------------------------------------------------ */
+.breadcrumb {
+  background: var(--white);
+  border-bottom: 1px solid #e5e5e5;
+  padding: 12px 24px;
+  font-size: 13px;
+  color: #888;
+}
+.breadcrumb a {
+  color: #555;
+  font-weight: 600;
+  transition: color .15s;
+}
+.breadcrumb a:hover { color: var(--red); }
+.breadcrumb span { color: #333; font-weight: 600; }
+.bc-sep { margin: 0 6px; color: #bbb; }
+
+/* Equipment grid -------------------------------------------- */
+.eq-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.eq-card {
+  background: var(--white);
+  border-radius: 12px;
+  border: 1.5px solid #e5e5e5;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow .2s, transform .2s;
+}
+.eq-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,.10);
+  transform: translateY(-2px);
+}
+.eq-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.eq-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.eq-brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 4px;
+}
+.eq-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  line-height: 1;
+  color: var(--black);
+}
+.eq-specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border: 1.5px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.eq-spec {
+  padding: 12px 10px;
+  text-align: center;
+  border-right: 1.5px solid #eee;
+}
+.eq-spec:last-child { border-right: none; }
+.eq-spec span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 4px;
+}
+.eq-spec strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.2;
+}
+.eq-cta { margin-top: auto; }
+
+/* Responsive */
+@media(max-width:1024px) { .eq-grid { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:600px)  { .eq-grid { grid-template-columns: 1fr; } }
+@media(max-width:900px)  {
+  .breadcrumb { padding: 10px 20px; font-size: 12px; }
+}
