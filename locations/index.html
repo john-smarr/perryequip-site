@@ -72,9 +72,9 @@
 </div>
 <div class="loc-tabs">
   <div class="loc-tabs-inner">
-    <button class="loc-tab active" onclick="scrollTo('americus')">Americus, GA</button>
-    <button class="loc-tab" onclick="scrollTo('loxley')">Loxley, AL</button>
-    <button class="loc-tab" onclick="scrollTo('coming-soon')">Coming Soon</button>
+    <button class="loc-tab active" onclick="scrollToLoc('americus',this)">Americus, GA</button>
+    <button class="loc-tab" onclick="scrollToLoc('loxley',this)">Loxley, AL</button>
+    <button class="loc-tab" onclick="scrollToLoc('coming-soon',this)">Coming Soon</button>
   </div>
 </div>
 <div class="loc-section" id="americus">
@@ -229,7 +229,11 @@ function toggleFaq(btn){
 }
 </script>
 <script>
-function scrollTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+function scrollToLoc(id,btn){
+  document.querySelectorAll('.loc-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
 </script>
 </body>
 </html>
