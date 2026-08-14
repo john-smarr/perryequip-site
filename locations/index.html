@@ -232,7 +232,11 @@ function toggleFaq(btn){
 function scrollToLoc(id,btn){
   document.querySelectorAll('.loc-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  const el=document.getElementById(id);
+  const tabs=document.querySelector('.loc-tabs');
+  const offset=72+tabs.offsetHeight;
+  const top=el.getBoundingClientRect().top+window.pageYOffset-offset;
+  window.scrollTo({top,behavior:'smooth'});
 }
 </script>
 </body>
