@@ -173,6 +173,8 @@ function toggleFaq(btn){
   document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
 }
+const machine=new URLSearchParams(window.location.search).get('machine');
+if(machine)document.querySelector('input[name="machine"]').value=machine;
 </script>
 </body>
 </html>
