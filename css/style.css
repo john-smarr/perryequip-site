@@ -131,7 +131,7 @@ footer{background:var(--black);color:rgba(255,255,255,.6);padding:60px 24px 32px
 .footer-col a{display:block;font-size:14px;color:rgba(255,255,255,.65);margin-bottom:10px;transition:color .15s}
 .footer-col a:hover{color:var(--yellow)}
 .footer-bottom{border-top:1px solid #222;padding-top:24px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
-.mobile-nav{display:none;background:var(--black);padding:16px 24px 24px;border-top:1px solid #222;overflow-y:auto;max-height:calc(100vh - 72px)}
+.mobile-nav{display:none;background:var(--black);padding:16px 24px 24px;border-top:1px solid #222}
 .mobile-nav a{display:block;color:rgba(255,255,255,.8);font-size:15px;font-weight:600;padding:10px 0;border-bottom:1px solid #1a1a1a}
 .mobile-nav a:hover{color:var(--yellow)}
 .mobile-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:16px 0 6px}
@@ -143,7 +143,7 @@ footer{background:var(--black);color:rgba(255,255,255,.6);padding:60px 24px 32px
 @media(max-width:768px){
       .nav-links{display:none}
       .nav-hamburger{display:block}
-      .mobile-nav.open{display:block}
+      .mobile-nav.open{display:block;position:fixed;top:72px;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:99}
       .hero{min-height:auto}
       .hero-inner{min-height:auto;padding:60px 20px 48px}
       .hero h1{font-size:44px}
@@ -164,7 +164,7 @@ footer{background:var(--black);color:rgba(255,255,255,.6);padding:60px 24px 32px
 :root{--red:#ea0000;--yellow:#f4c400;--black:#0d0d0d;--light:#f5f5f5;--white:#fff;--font-display:'Barlow Condensed',sans-serif;--font-body:'Barlow',sans-serif}
 .nav-links{display:flex;align-items:center;list-style:none}
 .nav-links>li>a{color:var(--white);font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:0 18px;height:72px;display:flex;align-items:center;border-bottom:3px solid transparent;transition:border-color .15s,color .15s}
-.mobile-nav.open{display:block}
+.mobile-nav.open{display:block;position:fixed;top:72px;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:99}
 section{padding:72px 24px}
 .section-sub{font-size:17px;color:#555;line-height:1.6;margin-bottom:40px}
 .faq-answer{font-size:15px;color:#555;line-height:1.7;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s}
