@@ -143,7 +143,7 @@ footer{background:var(--black);color:rgba(255,255,255,.6);padding:60px 24px 32px
 @media(max-width:768px){
       .nav-links{display:none}
       .nav-hamburger{display:block}
-      .mobile-nav.open{display:block;position:fixed;top:72px;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:99}
+      .mobile-nav.open{display:block;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 72px)}
       .hero{min-height:auto}
       .hero-inner{min-height:auto;padding:60px 20px 48px}
       .hero h1{font-size:44px}
