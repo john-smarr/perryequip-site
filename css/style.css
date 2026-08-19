@@ -131,7 +131,7 @@ footer{background:var(--black);color:rgba(255,255,255,.6);padding:60px 24px 32px
 .footer-col a{display:block;font-size:14px;color:rgba(255,255,255,.65);margin-bottom:10px;transition:color .15s}
 .footer-col a:hover{color:var(--yellow)}
 .footer-bottom{border-top:1px solid #222;padding-top:24px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
-.mobile-nav{display:none;background:var(--black);padding:16px 24px 24px;border-top:1px solid #222}
+.mobile-nav{display:none;background:var(--black);padding:16px 24px 24px;border-top:1px solid #222;overflow-y:auto;max-height:calc(100vh - 72px)}
 .mobile-nav a{display:block;color:rgba(255,255,255,.8);font-size:15px;font-weight:600;padding:10px 0;border-bottom:1px solid #1a1a1a}
 .mobile-nav a:hover{color:var(--yellow)}
 .mobile-section{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:16px 0 6px}
@@ -315,6 +315,7 @@ textarea{min-height:120px;resize:vertical}
 
 /* Breadcrumb ------------------------------------------------ */
 .breadcrumb {
+  position: static;
   background: var(--white);
   border-bottom: 1px solid #e5e5e5;
   padding: 12px 24px;
