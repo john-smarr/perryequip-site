@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deals &amp; Pricing | Perry Brothers Equipment Company</title>
+  <meta name="description" content="Shop current deals on SANY excavators and equipment at Perry Brothers Equipment. Transparent starting prices with industry-leading warranties.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="canonical" href="https://perryequip.com/deals/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Deals &amp; Pricing | Perry Brothers Equipment Company">
+  <meta property="og:description" content="Shop current deals on SANY excavators and equipment at Perry Brothers Equipment. Transparent starting prices with industry-leading warranties.">
+  <meta property="og:url" content="https://perryequip.com/deals/">
+  <meta property="og:site_name" content="Perry Brothers Equipment Company">
+  <meta property="og:image" content="https://perryequip.com/images/perry-logo.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://perryequip.com/"},
+      {"@type": "ListItem", "position": 2, "name": "Deals", "item": "https://perryequip.com/deals/"}
+    ]
+  }
+  </script>
+  <style>
+    /* ── Hero ── */
+    .deals-hero {
+      position: relative;
+      min-height: 520px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      background: #0d0d0d;
+    }
+    .deals-hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+    }
+    .deals-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.3) 60%, rgba(0,0,0,.05) 100%);
+    }
+    .deals-hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      width: 100%;
+    }
+    .deals-hero-inner h1 {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1;
+      color: #fff;
+      margin: 0 0 10px;
+    }
+    .deals-hero-inner h1 b {
+      color: #f4c400;
+    }
+    .deals-hero-inner p {
+      font-size: 18px;
+      color: rgba(255,255,255,.8);
+      margin: 0;
+    }
+
+    /* ── Videos ── */
+    .pbe-video-section {
+      width: 100%;
+      background: #f4f4f4;
+      padding: 48px 0 54px;
+    }
+    .pbe-video-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .pbe-video-header { margin-bottom: 24px; }
+    .pbe-video-title {
+      margin: 0 0 10px;
+      color: #111;
+      font-size: 42px;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-family: var(--font-display);
+    }
+    .pbe-video-subtitle { margin: 0; color: #555; font-size: 16px; }
+    .pbe-video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .pbe-video-card { display: flex; flex-direction: column; }
+    .pbe-video-thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #000;
+      cursor: pointer;
+    }
+    .pbe-video-thumb video { width: 100%; height: 100%; object-fit: cover; }
+    .pbe-video-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70px;
+      height: 70px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .pbe-video-play::before {
+      content: "";
+      margin-left: 5px;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 22px solid #fff;
+    }
+    .pbe-video-thumb.playing .pbe-video-play { opacity: 0; }
+    .pbe-video-body { padding-top: 12px; }
+    .pbe-video-card-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-family: var(--font-display);
+    }
+    .pbe-video-card-desc { font-size: 15px; color: #444; }
+
+    /* ── Top Sellers ── */
+    .pbe-top-sellers {
+      width: 100%;
+      background: #050505;
+      color: #fff;
+      padding: 48px 0 42px;
+    }
+    .pbe-top-sellers-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .pbe-top-sellers-head { text-align: center; margin-bottom: 28px; }
+    .pbe-top-sellers-kicker {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(244,196,0,0.1);
+      color: #f4c400;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .pbe-top-sellers-title {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: 44px;
+      line-height: 1.02;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      font-family: var(--font-display);
+    }
+    .pbe-top-sellers-subtitle {
+      margin: 0 auto;
+      max-width: 760px;
+      color: rgba(255,255,255,0.76);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+    .pbe-top-sellers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+    .pbe-top-seller-card {
+      background: linear-gradient(180deg, #101010 0%, #0a0a0a 100%);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .pbe-top-seller-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.34);
+    }
+    .pbe-top-seller-image-wrap { position: relative; }
+    .pbe-top-seller-image {
+      aspect-ratio: 4/3;
+      background: #000;
+      overflow: hidden;
+    }
+    .pbe-top-seller-image img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .pbe-top-seller-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .pbe-top-seller-stock-badge {
+      position: absolute;
+      top: 52px;
+      left: 12px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      background: #d91f11;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    }
+    .pbe-top-seller-body { padding: 18px 18px 20px; }
+    .pbe-top-seller-model {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-family: var(--font-display);
+    }
+    .pbe-top-seller-name {
+      margin: 0 0 16px;
+      color: rgba(255,255,255,0.72);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 42px;
+    }
+    .pbe-top-seller-price-label {
+      margin-bottom: 4px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .pbe-top-seller-price {
+      margin-bottom: 8px;
+      color: #46ff2a;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      font-family: var(--font-display);
+    }
+    .pbe-top-seller-rebate {
+      margin: 0 0 16px;
+      color: #f4c400;
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+    .pbe-top-seller-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: #f4c400;
+      color: #111 !important;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .pbe-top-seller-link:hover { transform: translateY(-1px); opacity: 0.96; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .pbe-top-sellers-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pbe-top-sellers-title { font-size: 36px; }
+    }
+    @media (max-width: 900px) {
+      .pbe-video-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 767px) {
+      .pbe-top-sellers { padding: 34px 0 30px; }
+      .pbe-top-sellers-inner { padding: 0 14px; }
+      .pbe-top-sellers-head { margin-bottom: 20px; }
+      .pbe-top-sellers-title { font-size: 28px; }
+      .pbe-top-sellers-subtitle { font-size: 15px; }
+      .pbe-top-sellers-grid { grid-template-columns: 1fr; gap: 16px; }
+      .pbe-top-seller-card { border-radius: 14px; }
+      .pbe-top-seller-body { padding: 16px 16px 18px; }
+      .pbe-top-seller-model { font-size: 24px; }
+      .pbe-top-seller-price { font-size: 30px; }
+      .deals-hero-inner h1 { font-size: 42px; }
+    }
+    @media (max-width: 640px) {
+      .pbe-video-grid { grid-template-columns: 1fr; }
+      .pbe-video-title { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="https://www.facebook.com/dozers.com1/" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook</a>
+  <a href="tel:2299240035"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>(229) 924-0035</a>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/"><img src="/images/perry-logo.png" alt="Perry Brothers Equipment Company"></a>
+    <ul class="nav-links">
+      <li>
+        <a href="/sales/">Sales</a>
+        <div class="dropdown">
+          <a href="/sales/small-excavators/">Small Excavators</a>
+          <a href="/sales/medium-excavators/">Medium Excavators</a>
+          <a href="/sales/large-excavators/">Large Excavators</a>
+          <a href="/sales/motor-graders/">Motor Graders</a>
+          <a href="/sales/wheel-loaders/">Wheel Loaders</a>
+          <a href="/sales/machine-rollers/">Machine Rollers</a>
+          <a href="/sales/telehandlers/">Telehandlers</a>
+          <a href="/sales/backhoes/">Backhoes</a>
+          <a href="/sales/skid-steers/">Skid Steers</a>
+        </div>
+      </li>
+      <li><a href="/rentals/">Rentals</a></li>
+      <li><a href="/service/">Service</a></li>
+      <li><a href="/locations/">Locations</a></li>
+      <li><a href="/media/">Media</a></li>
+      <li><a href="/contact/" class="nav-cta">Get a Quote</a></li>
+    </ul>
+    <button class="nav-hamburger" aria-label="Open menu" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-section">Sales</div>
+    <a href="/sales/small-excavators/">Small Excavators</a>
+    <a href="/sales/medium-excavators/">Medium Excavators</a>
+    <a href="/sales/large-excavators/">Large Excavators</a>
+    <a href="/sales/motor-graders/">Motor Graders</a>
+    <a href="/sales/wheel-loaders/">Wheel Loaders</a>
+    <a href="/sales/machine-rollers/">Machine Rollers</a>
+    <a href="/sales/telehandlers/">Telehandlers</a>
+    <a href="/sales/backhoes/">Backhoes</a>
+    <a href="/sales/skid-steers/">Skid Steers</a>
+    <div class="mobile-section">Pages</div>
+    <a href="/rentals/">Rentals</a>
+    <a href="/service/">Service</a>
+    <a href="/locations/">Locations</a>
+    <a href="/media/">Media</a>
+    <a href="/contact/">Get a Quote</a>
+  </div>
+</nav>
+
+<!-- Hero with background video -->
+<div class="deals-hero">
+  <video class="deals-hero-video" autoplay muted playsinline loop>
+    <source src="https://perryequip.com/wp-content/uploads/2026/03/Sany-Sy50.mp4" type="video/mp4">
+  </video>
+  <div class="deals-hero-overlay"></div>
+  <div class="deals-hero-inner">
+    <h1>Heavy Equipment<br>that <b>works</b><br>as hard as you do</h1>
+    <p>Engines. Hydraulics. Full Service Support.</p>
+  </div>
+</div>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a><span class="bc-sep">›</span><span>Deals</span>
+</nav>
+
+<!-- Videos Section -->
+<section class="pbe-video-section">
+  <div class="pbe-video-inner">
+    <div class="pbe-video-header">
+      <h2 class="pbe-video-title">Videos</h2>
+      <p class="pbe-video-subtitle">Watch featured equipment in action on real jobsites.</p>
+    </div>
+    <div class="pbe-video-grid">
+
+      <article class="pbe-video-card">
+        <div class="pbe-video-thumb">
+          <video preload="metadata">
+            <source src="https://videos.files.wordpress.com/8BHT0BlK/sany-st230.mp4" type="video/mp4">
+          </video>
+          <div class="pbe-video-play"></div>
+        </div>
+        <div class="pbe-video-body">
+          <div class="pbe-video-card-title">SANY ST230 Skid Steer</div>
+          <div class="pbe-video-card-desc">See the ST230 in action on real jobsites.</div>
+        </div>
+      </article>
+
+      <article class="pbe-video-card">
+        <div class="pbe-video-thumb">
+          <video preload="metadata">
+            <source src="https://videos.files.wordpress.com/Taz0ohoY/sany-sy35.mp4" type="video/mp4">
+          </video>
+          <div class="pbe-video-play"></div>
+        </div>
+        <div class="pbe-video-body">
+          <div class="pbe-video-card-title">SANY SY35 Excavator</div>
+          <div class="pbe-video-card-desc">Compact power built for tight jobsite performance.</div>
+        </div>
+      </article>
+
+      <article class="pbe-video-card">
+        <div class="pbe-video-thumb">
+          <video preload="metadata">
+            <source src="https://videos.files.wordpress.com/U4q3QNmk/sany-sy80.mp4" type="video/mp4">
+          </video>
+          <div class="pbe-video-play"></div>
+        </div>
+        <div class="pbe-video-body">
+          <div class="pbe-video-card-title">SANY SY80 Excavator</div>
+          <div class="pbe-video-card-desc">Heavy-duty excavation with serious power.</div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- Top Sellers Section -->
+<section class="pbe-top-sellers">
+  <div class="pbe-top-sellers-inner">
+    <div class="pbe-top-sellers-head">
+      <span class="pbe-top-sellers-kicker">Most Requested Machines</span>
+      <h2 class="pbe-top-sellers-title">Top Sellers</h2>
+      <p class="pbe-top-sellers-subtitle">Explore some of our most requested machines with updated pricing.</p>
+    </div>
+    <div class="pbe-top-sellers-grid">
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <span class="pbe-top-seller-badge">Open Cab</span>
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/48A7508.webp?resize=800%2C600&ssl=1" alt="SANY SY35 open cab excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY35</h3>
+          <p class="pbe-top-seller-name">SANY SY35 Open Cab Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$39,999</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY35+Open+Cab">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <span class="pbe-top-seller-badge">Cab</span>
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/48A5583.webp?resize=800%2C600&ssl=1" alt="SANY SY35 cab excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY35</h3>
+          <p class="pbe-top-seller-name">SANY SY35 Cab Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$44,999</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY35+Cab">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <span class="pbe-top-seller-badge">Open Cab</span>
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/48A6417.webp?resize=800%2C600&ssl=1" alt="SANY SY50 open cab excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY50</h3>
+          <p class="pbe-top-seller-name">SANY SY50 Open Cab Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$57,499</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY50+Open+Cab">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <span class="pbe-top-seller-badge">Cab</span>
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/07/48A5714.webp?resize=800%2C600&ssl=1" alt="SANY SY50 cab excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY50</h3>
+          <p class="pbe-top-seller-name">SANY SY50 Cab Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$62,499</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY50+Cab">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/48A7363.webp?resize=800%2C600&ssl=1" alt="SANY SY60 excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY60</h3>
+          <p class="pbe-top-seller-name">SANY SY60 Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$67,499</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY60">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/48A5904.webp?resize=800%2C600&ssl=1" alt="SANY SY80 excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY80</h3>
+          <p class="pbe-top-seller-name">SANY SY80 Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$98,499</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY80">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <span class="pbe-top-seller-badge">New</span>
+          <span class="pbe-top-seller-stock-badge">Only 2 Left</span>
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/07/48A6063.webp?resize=800%2C600&ssl=1" alt="SANY SY215 Excavator" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">SY215 + Bucket &amp; Thumb</h3>
+          <p class="pbe-top-seller-name">SANY SY215 Excavator</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$165,000</div>
+          <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY215">Get a Quote</a>
+        </div>
+      </article>
+
+      <article class="pbe-top-seller-card">
+        <div class="pbe-top-seller-image-wrap">
+          <div class="pbe-top-seller-image">
+            <img src="https://i0.wp.com/perryequip.com/wp-content/uploads/2026/04/IMG_3048.webp?resize=800%2C600&ssl=1" alt="SANY skid steer loader" loading="lazy" width="800" height="600">
+          </div>
+        </div>
+        <div class="pbe-top-seller-body">
+          <h3 class="pbe-top-seller-model">Skid Steer</h3>
+          <p class="pbe-top-seller-name">SANY Skid Steer Loader</p>
+          <div class="pbe-top-seller-price-label">Starting at</div>
+          <div class="pbe-top-seller-price">$64,900</div>
+          <p class="pbe-top-seller-rebate">Comes with 3 Year/3,000 Hour Warranty</p>
+          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+Skid+Steer">Get a Quote</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/images/perry-logo.png" alt="Perry Brothers Equipment Company">
+        <p>South Georgia's trusted SANY heavy equipment dealer. Sales, rentals, service, and parts for contractors, farms, and crews across the Southeast.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Equipment</h4>
+        <a href="/sales/small-excavators/">Small Excavators</a>
+        <a href="/sales/medium-excavators/">Medium Excavators</a>
+        <a href="/sales/large-excavators/">Large Excavators</a>
+        <a href="/sales/motor-graders/">Motor Graders</a>
+        <a href="/sales/wheel-loaders/">Wheel Loaders</a>
+        <a href="/sales/machine-rollers/">Machine Rollers</a>
+        <a href="/sales/telehandlers/">Telehandlers</a>
+        <a href="/sales/backhoes/">Backhoes</a>
+        <a href="/sales/skid-steers/">Skid Steers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="/about/">About</a>
+        <a href="/rentals/">Rentals</a>
+        <a href="/service/">Service</a>
+        <a href="/locations/">Locations</a>
+        <a href="/media/">Media</a>
+        <a href="/contact/">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="tel:2299240035">(229) 924-0035</a>
+        <a href="tel:2516517269">(251) 651-7269</a>
+        <a href="mailto:contact@perryequip.com">contact@perryequip.com</a>
+        <a href="/locations/">Americus, GA &amp; Loxley, AL</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Perry Brothers Equipment Company. All rights reserved.</span>
+      <span>South Georgia SANY Dealer</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(){const nav=document.getElementById('mobileNav');nav.classList.toggle('open')}
+
+document.querySelectorAll('.pbe-video-thumb').forEach(container => {
+  const video = container.querySelector('video');
+  container.addEventListener('click', () => {
+    if (video.paused) {
+      document.querySelectorAll('.pbe-video-thumb video').forEach(v => {
+        v.pause();
+        v.parentElement.classList.remove('playing');
+        v.controls = false;
+      });
+      video.play();
+      video.controls = true;
+      container.classList.add('playing');
+    } else {
+      video.pause();
+      container.classList.remove('playing');
+      video.controls = false;
+    }
+  });
+});
+</script>
+</body>
+</html>
