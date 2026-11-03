@@ -7,3 +7,16 @@
 /rentals/machine-rollers/  /contact/  301
 /rentals/telehandlers/  /contact/  301
 /rentals/backhoes/  /contact/  301
+
+# Old WordPress / confirmation pages
+/rental-confirmation/  /rentals/  301
+/rental-confirmation  /rentals/  301
+
+# Common WordPress paths
+/wp-admin  /  301
+/wp-admin/  /  301
+/wp-login.php  /  301
+/feed/  /  301
+/feed  /  301
+/wp-content/*  /  301
+/wp-includes/*  /  301
