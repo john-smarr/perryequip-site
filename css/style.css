@@ -24,8 +24,25 @@ nav{background:var(--black);border-bottom:2px solid #222;position:sticky;top:0;z
 .nav-links>li:hover .dropdown{opacity:1;pointer-events:all;transform:translateY(0)}
 .dropdown a{display:block;padding:10px 18px;color:rgba(255,255,255,.8);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid #222;transition:background .1s,color .1s}
 .dropdown a:hover{background:#1a1a1a;color:var(--yellow)}
+.nav-deals{color:var(--red)!important;font-weight:700!important;position:relative}
+.nav-deals::after{content:"HOT";position:absolute;top:2px;right:50%;transform:translateX(50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;line-height:1.2;letter-spacing:.04em}
 .nav-cta{background:var(--red);color:var(--white)!important;padding:10px 20px!important;height:auto!important;border-radius:6px;font-size:13px!important;border-bottom:none!important;margin-left:12px}
 .nav-cta:hover{background:#c40000!important}
+/* Deals zip-code gate modal */
+#deals-gate{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+#deals-gate.dg-open{display:flex}
+.dg-box{background:#fff;border-radius:16px;padding:40px 36px 32px;max-width:400px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:dg-pop .25s ease}
+@keyframes dg-pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.dg-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;color:#999;cursor:pointer;line-height:1}
+.dg-close:hover{color:#333}
+.dg-icon{font-size:40px;margin-bottom:8px}
+.dg-title{font-family:var(--font-display);font-size:26px;color:var(--black);margin-bottom:6px}
+.dg-sub{font-size:14px;color:#666;margin-bottom:20px;line-height:1.5}
+.dg-input{width:100%;padding:14px;font-size:18px;border:2px solid #ddd;border-radius:8px;text-align:center;letter-spacing:.15em;font-family:var(--font-body);outline:none;transition:border-color .15s}
+.dg-input:focus{border-color:var(--red)}
+.dg-btn{width:100%;margin-top:14px;padding:14px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:700;font-family:var(--font-body);cursor:pointer;transition:background .15s}
+.dg-btn:hover{background:#c40000}
+.dg-err{margin-top:14px;font-size:13px;color:var(--red);min-height:18px;line-height:1.5}
 .nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px}
 .nav-hamburger span{display:block;width:24px;height:2px;background:white;margin:5px 0}
 .hero{position:relative;min-height:640px;overflow:hidden;color:var(--white);padding:0}

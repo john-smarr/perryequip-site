@@ -54,6 +54,7 @@
           <a href="/sales/skid-steers/">Skid Steers</a>
         </div>
       </li>
+      <li><a href="/deals/" class="nav-deals">Deals</a></li>
       <li><a href="/rentals/">Rentals</a></li>
       <li><a href="/service/">Service</a></li>
       <li><a href="/locations/">Locations</a></li>
@@ -76,6 +77,7 @@
     <a href="/sales/backhoes/">Backhoes</a>
     <a href="/sales/skid-steers/">Skid Steers</a>
     <div class="mobile-section">Pages</div>
+    <a href="/deals/" style="color:var(--red);font-weight:700;">Deals</a>
     <a href="/rentals/">Rentals</a>
     <a href="/service/">Service</a>
     <a href="/locations/">Locations</a>
@@ -190,5 +192,6 @@
 function toggleMenu(){const nav=document.getElementById('mobileNav');nav.classList.toggle('open')}
 function toggleFaq(btn){const item=btn.closest('.faq-item');const isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!isOpen)item.classList.add('open');}
 </script>
+<script src="/js/deals-gate.js"></script>
 </body>
 </html>
