@@ -89,7 +89,7 @@
   document.addEventListener("click", function (e) {
     var trigger = e.target.closest("[data-gallery]");
     if (!trigger) return;
-    var card = trigger.closest(".eq-card");
+    var card = trigger.closest(".eq-card") || trigger.closest(".pbe-top-seller-card");
     if (!card) return;
     var allSrcs = [];
     var imgs = card.querySelectorAll("[data-gallery]");
