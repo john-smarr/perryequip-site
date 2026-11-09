@@ -447,13 +447,19 @@ textarea{min-height:120px;resize:vertical}
   position: absolute;
   bottom: 8px;
   right: 8px;
-  background: rgba(0,0,0,.65);
+  background: rgba(0,0,0,.75);
   color: #fff;
   font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
+  font-weight: 700;
+  padding: 6px 14px;
   border-radius: 4px;
-  pointer-events: none;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+  z-index: 2;
+}
+.eq-gallery-badge:hover {
+  background: rgba(0,0,0,.9);
 }
 .eq-thumbstrip {
   display: none;
