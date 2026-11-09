@@ -66,10 +66,11 @@
     inputArea = widget.querySelector(".pbe-chat-input");
     bubble = widget.querySelector(".pbe-chat-bubble");
 
+    var opened = false;
     bubble.onclick = function () {
       container.style.display = "flex";
       bubble.style.display = "none";
-      if (current === 0) showStep();
+      if (!opened) { showStep(); opened = true; }
     };
     widget.querySelector(".pbe-chat-close").onclick = function () {
       container.style.display = "none";
