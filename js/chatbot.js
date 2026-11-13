@@ -193,7 +193,7 @@
           restoreMessages();
         } else {
           addMessage("Hey there! Our team is away right now, but I can answer questions about our equipment, services, rentals, locations, and more. How can I help?", "bot");
-          addQuoteButton();
+          /* TODO: re-enable on Monday — addQuoteButton(); */
         }
       }
       input.focus();
@@ -314,9 +314,11 @@
         conversation.push({ role: "assistant", content: reply });
         saveSession();
 
+        /* TODO: re-enable lead capture on Monday
         if (data.action === "capture_lead") {
           startLeadCapture();
         }
+        */
 
         input.focus();
       })
@@ -338,9 +340,11 @@
       addMessage(result.reply, "bot");
       conversation.push({ role: "assistant", content: result.reply });
       saveSession();
+      /* TODO: re-enable lead capture on Monday
       if (result.action === "capture_lead") {
         startLeadCapture();
       }
+      */
       input.focus();
     }, 600);
   }

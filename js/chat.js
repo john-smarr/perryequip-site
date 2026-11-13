@@ -3,7 +3,7 @@
    Tawk.to widget is HIDDEN by default and only shown when agents are online. */
 (function () {
   /* ── Configuration ── */
-  var TAWKTO_PROPERTY_ID = "6af5ff0bd30fa33c3df15025";
+  var TAWKTO_PROPERTY_ID = "DISABLED_UNTIL_MONDAY"; /* TODO: restore to 6af5ff0bd30fa33c3df15025 on Monday */
   var TAWKTO_WIDGET_ID = "1k78eohsm";
 
   var aiChatLoaded = false;
