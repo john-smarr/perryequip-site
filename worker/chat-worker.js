@@ -48,7 +48,7 @@ function generateChatId() {
 }
 
 async function readChat(chatId, env) {
-  var raw = await env.CHAT_KV.get("chat:" + chatId, { cacheTtl: 60 });
+  var raw = await env.CHAT_KV.get("chat:" + chatId);
   if (!raw) return null;
   return JSON.parse(raw);
 }
