@@ -138,6 +138,9 @@
   var chatPollInterval = null;
   var listPollInterval = null;
   var audioCtx = null;
+  var originalTitle = document.title;
+  var titleBlink = null;
+  var titleBlinking = false;
 
   /* ── Elements ── */
   var loginScreen = document.getElementById("login");
@@ -183,6 +186,29 @@
       }, 200);
     } catch (e) {}
   }
+
+  /* ── Tab title blink ── */
+  function startTitleBlink(msg) {
+    if (titleBlinking) return;
+    titleBlinking = true;
+    var show = true;
+    titleBlink = setInterval(function () {
+      document.title = show ? "** " + msg + " **" : originalTitle;
+      show = !show;
+    }, 800);
+  }
+
+  function stopTitleBlink() {
+    if (titleBlink) {
+      clearInterval(titleBlink);
+      titleBlink = null;
+    }
+    titleBlinking = false;
+    document.title = originalTitle;
+  }
+
+  /* Stop blinking when tab gets focus */
+  window.addEventListener("focus", stopTitleBlink);
 
   /* ── API helpers ── */
   function apiFetch(path, options) {
@@ -347,7 +373,19 @@
 
     /* Messages — only re-render if count changed */
     if (chatMessagesEl.dataset.count === String(chat.messages.length)) return;
+    var prevCount = parseInt(chatMessagesEl.dataset.count || "0");
     chatMessagesEl.dataset.count = String(chat.messages.length);
+
+    /* Alert on new visitor messages */
+    if (prevCount > 0 && chat.messages.length > prevCount) {
+      var lastMsg = chat.messages[chat.messages.length - 1];
+      if (lastMsg.role === "visitor") {
+        playAlert();
+        if (!document.hasFocus()) {
+          startTitleBlink("New Message");
+        }
+      }
+    }
 
     chatMessagesEl.innerHTML = "";
     for (var i = 0; i < chat.messages.length; i++) {

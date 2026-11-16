@@ -368,12 +368,6 @@
           }
         }
 
-        if (data.leadCapture && !leadMode) {
-          setTimeout(function () {
-            startLeadCapture("Can I get your contact info so our team can follow up with you?");
-          }, 1000);
-        }
-
         saveSession();
         input.focus();
       })
@@ -482,13 +476,6 @@
             lastPollTs = Math.max(lastPollTs, m.ts);
           }
           saveSession();
-        }
-
-        /* Lead capture trigger from server */
-        if (data.leadCapture && !leadMode) {
-          setTimeout(function () {
-            startLeadCapture("Can I get your contact info so our team can follow up with you?");
-          }, 1000);
         }
 
         /* Stop polling if chat is closed */
