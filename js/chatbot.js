@@ -1,26 +1,24 @@
-/* Perry Brothers Equipment — AI Chatbot (offline fallback)
-   Free-form conversation powered by Claude API via Cloudflare Worker.
-   Falls back to keyword-based responses when API is unavailable.
-   Includes lead capture when visitor wants a quote/demo/rental. */
+/* Perry Brothers Equipment — Chat Widget
+   Real-time chat with live agents + AI fallback via Cloudflare Worker + KV.
+   Polls for new messages every 3 seconds. */
 (function () {
   /* ── Configuration ── */
-  var AI_ENDPOINT = "https://raspy-cell-4751.lance-74b.workers.dev/api/chat";
-  var LEAD_ENDPOINT = "https://raspy-cell-4751.lance-74b.workers.dev";
+  var API_BASE = "https://raspy-cell-4751.lance-74b.workers.dev";
   var RECAPTCHA_KEY = "6LcLRRguAAAAAH6s6xE1CYlkVv6KsYYeyVbR8bgX";
   var SESSION_KEY = "pbe_chat_session";
+  var POLL_MS = 3000;
 
   var container, messages, inputArea, widget, bubble, input, sendBtn;
-  var conversation = [];
+  var chatId = null;
+  var chatMode = null; /* "waiting", "agent", "ai" */
+  var pollInterval = null;
+  var lastPollTs = 0;
+  var conversation = []; /* local copy for display */
   var leadData = {};
   var leadMode = false;
   var leadStep = 0;
   var opened = false;
-  var aiAvailable = true; /* will flip to false if API fails */
-  var waitingForAgent = false;
-  var agentTimer = null;
-  var pendingMessage = "";
   var logSent = false;
-  var AGENT_WAIT_MS = 30000; /* 30 seconds for an agent to respond */
 
   var leadSteps = [
     { msg: "Great! What's your first name?", field: "first_name", type: "text" },
@@ -29,7 +27,7 @@
     { msg: "And your email address?", field: "email", type: "email" }
   ];
 
-  /* ── Offline knowledge base (used when API is unavailable) ── */
+  /* ── Offline knowledge base (used when API is unreachable) ── */
   var kb = {
     hours: "We're open Monday through Friday, 8am to 5pm at both locations.",
     locations: "We have two locations:\n• Americus, GA — 523 US Highway 280 E — (229) 924-0035\n• Loxley, AL — 3825 S Hickory St — (251) 651-7269\nMontgomery, AL and Panama City, FL coming soon!",
@@ -58,21 +56,16 @@
     { pattern: /demo|try|test drive/i, key: "demo" },
     { pattern: /excavat|digger|mini ex/i, key: "excavator" },
     { pattern: /what.*carry|what.*sell|equipment|machine|inventory|lineup/i, key: "equipment" },
-    { pattern: /who|about|history|family|company/i, key: "about" },
-    { pattern: /price|cost|how much|quote|pricing/i, key: "_quote" },
-    { pattern: /buy|purchase|interested|looking for/i, key: "_quote" }
+    { pattern: /who|about|history|family|company/i, key: "about" }
   ];
 
   function offlineReply(userMsg) {
     for (var i = 0; i < kbPatterns.length; i++) {
       if (kbPatterns[i].pattern.test(userMsg)) {
-        if (kbPatterns[i].key === "_quote") {
-          return { reply: "I'd need our team to get you exact pricing on that. Want me to have someone reach out to you?", action: "capture_lead" };
-        }
-        return { reply: kb[kbPatterns[i].key] };
+        return kb[kbPatterns[i].key];
       }
     }
-    return { reply: "I can help with questions about our equipment, services, rentals, locations, hours, warranty, financing, and more. Or if you'd like our team to reach out, just say \"get a quote\" and I'll grab your info!" };
+    return "I can help with questions about our equipment, services, rentals, locations, hours, warranty, financing, and more. Or call us at (229) 924-0035!";
   }
 
   /* ── Page context detection ── */
@@ -93,21 +86,14 @@
       var category = parts[1].replace(/-/g, " ");
       return "Visitor is browsing the " + category + " category page.";
     }
-
     if (parts[0] === "sales" && parts.length === 3) {
       var model = parts[2].toUpperCase();
       var cat = parts[1].replace(/-/g, " ");
       return "Visitor is viewing the SANY " + model + " product page (" + cat + ").";
     }
-
-    if (parts.length === 1 && parts[0].includes("-")) {
-      return "Visitor is reading a blog article.";
-    }
-
     return "Visitor is browsing the website.";
   }
 
-  /* Get machine model from URL if on a product page */
   function getMachineFromPage() {
     var parts = window.location.pathname.replace(/\/+$/, "").split("/").filter(Boolean);
     if (parts[0] === "sales" && parts.length === 3) {
@@ -119,7 +105,16 @@
   /* ── Session persistence ── */
   function saveSession() {
     try {
-      var data = { conversation: conversation, leadData: leadData, leadMode: leadMode, leadStep: leadStep, ts: Date.now() };
+      var data = {
+        chatId: chatId,
+        chatMode: chatMode,
+        conversation: conversation,
+        leadData: leadData,
+        leadMode: leadMode,
+        leadStep: leadStep,
+        lastPollTs: lastPollTs,
+        ts: Date.now()
+      };
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
     } catch (e) {}
   }
@@ -129,32 +124,31 @@
       var raw = sessionStorage.getItem(SESSION_KEY);
       if (!raw) return false;
       var data = JSON.parse(raw);
-      /* Expire after 30 minutes */
       if (Date.now() - data.ts > 30 * 60 * 1000) {
         sessionStorage.removeItem(SESSION_KEY);
         return false;
       }
+      chatId = data.chatId || null;
+      chatMode = data.chatMode || null;
       conversation = data.conversation || [];
       leadData = data.leadData || {};
       leadMode = data.leadMode || false;
       leadStep = data.leadStep || 0;
-      return conversation.length > 0;
+      lastPollTs = data.lastPollTs || 0;
+      return chatId !== null;
     } catch (e) { return false; }
   }
 
   function restoreMessages() {
-    /* Replay the greeting */
     addMessage("Hey there! How can we help you today?", "bot", true);
-    /* Replay conversation */
     for (var i = 0; i < conversation.length; i++) {
-      addMessage(conversation[i].content, conversation[i].role === "user" ? "user" : "bot", true);
+      var m = conversation[i];
+      var from = m.role === "visitor" ? "user" : "bot";
+      addMessage(m.content, from, true);
     }
     if (leadMode && leadStep < leadSteps.length) {
       addMessage(leadSteps[leadStep].msg, "bot", true);
       input.type = leadSteps[leadStep].type;
-    }
-    if (!leadMode) {
-      addQuoteButton();
     }
   }
 
@@ -196,9 +190,12 @@
         opened = true;
         if (hasSession) {
           restoreMessages();
+          /* Resume polling if we have an active chat */
+          if (chatId && chatMode !== "closed") {
+            startPolling();
+          }
         } else {
           addMessage("Hey there! How can we help you today?", "bot");
-          /* TODO: re-enable on Monday — addQuoteButton(); */
         }
       }
       input.focus();
@@ -207,11 +204,8 @@
     widget.querySelector(".pbe-chat-close").onclick = function () {
       container.style.display = "none";
       bubble.style.display = "flex";
-      sendChatLog();
+      sendChatClose();
     };
-
-    /* Send chat log if visitor navigates away */
-    window.addEventListener("beforeunload", sendChatLog);
 
     sendBtn.onclick = function () { handleSend(); };
     input.addEventListener("keydown", function (e) {
@@ -236,22 +230,6 @@
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
     return div;
-  }
-
-  function addQuoteButton() {
-    var wrap = document.createElement("div");
-    wrap.className = "pbe-chat-actions";
-    var btn = document.createElement("button");
-    btn.className = "pbe-chat-quote-btn";
-    btn.textContent = "Get a Quote";
-    btn.onclick = function () {
-      wrap.remove();
-      addMessage("Get a Quote", "user");
-      startLeadCapture("I'd love to help get you a quote!");
-    };
-    wrap.appendChild(btn);
-    messages.appendChild(wrap);
-    messages.scrollTop = messages.scrollHeight;
   }
 
   function showTyping() {
@@ -279,208 +257,196 @@
 
     if (leadMode) {
       handleLeadInput(val);
-    } else if (waitingForAgent) {
-      /* Still waiting for agent — queue the message */
-      conversation.push({ role: "user", content: val });
-      saveSession();
-    } else if (conversation.length === 0) {
-      /* First message — notify agents and wait 30s */
-      pendingMessage = val;
-      conversation.push({ role: "user", content: val });
-      saveSession();
-      startAgentWait();
+      return;
+    }
+
+    if (!chatId) {
+      /* First message — start a new chat */
+      startChat(val);
+    } else if (chatMode === "agent") {
+      /* Live chat with agent — send and wait for poll */
+      sendMessage(val);
+    } else if (chatMode === "ai") {
+      /* AI mode — send and get response */
+      sendMessage(val);
     } else {
-      sendToAI(val);
+      /* Still waiting — queue the message */
+      sendMessage(val);
     }
   }
 
-  /* ── Agent wait: 30s for a live agent, then Claude takes over ── */
-  function startAgentWait() {
-    waitingForAgent = true;
-    addMessage("Connecting you with an agent — one moment please!", "bot");
-    notifyAgents(pendingMessage);
-    agentTimer = setTimeout(agentTimeout, AGENT_WAIT_MS);
-  }
-
-  function agentTimeout() {
-    waitingForAgent = false;
-    agentTimer = null;
-
-    /* Claude takes over seamlessly */
-    var apology = "I'm sorry, no agents are available right now. Let me see what I can do!";
-    addMessage(apology, "bot");
-    conversation.push({ role: "assistant", content: apology });
-    saveSession();
-
-    /* Send all queued messages to Claude */
-    var typing = showTyping();
+  /* ── Start a new chat ── */
+  function startChat(msg) {
+    showTyping();
     sendBtn.disabled = true;
     input.disabled = true;
 
-    fetch(AI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: conversation, pageContext: getPageContext() })
-    })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        removeTyping();
-        sendBtn.disabled = false;
-        input.disabled = false;
-        var reply = data.reply || "Sorry, I had trouble with that. You can always call us at (229) 924-0035.";
-        addMessage(reply, "bot");
-        conversation.push({ role: "assistant", content: reply });
-        saveSession();
-        /* Collect contact info so agents can follow up */
-        setTimeout(function () {
-          startLeadCapture("I'd also love to get your info so our team can follow up with you!");
-        }, 1000);
-      })
-      .catch(function () {
-        removeTyping();
-        sendBtn.disabled = false;
-        input.disabled = false;
-        aiAvailable = false;
-        var result = offlineReply(pendingMessage);
-        addMessage(result.reply, "bot");
-        conversation.push({ role: "assistant", content: result.reply });
-        saveSession();
-        setTimeout(function () {
-          startLeadCapture("I'd love to get your info so our team can follow up with you!");
-        }, 1000);
-      });
-  }
-
-  function notifyAgents(msg) {
-    fetch(AI_ENDPOINT.replace("/api/chat", "/api/notify"), {
+    fetch(API_BASE + "/api/chat/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: msg,
         page: window.location.href,
-        timestamp: new Date().toISOString()
+        pageContext: getPageContext()
       })
-    }).catch(function () {}); /* fire and forget */
-  }
-
-  function sendChatLog() {
-    if (logSent || conversation.length === 0) return;
-    logSent = true;
-    fetch(AI_ENDPOINT.replace("/api/chat", "/api/chat-log"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        conversation: conversation,
-        leadData: leadData,
-        page: window.location.href,
-        timestamp: new Date().toISOString()
-      })
-    }).catch(function () {});
-  }
-
-  /* ── AI conversation ── */
-  function sendToAI(userMsg) {
-    conversation.push({ role: "user", content: userMsg });
-    saveSession();
-
-    /* If API has already failed, use offline mode directly */
-    if (!aiAvailable) {
-      handleOfflineReply(userMsg);
-      return;
-    }
-
-    var typing = showTyping();
-    sendBtn.disabled = true;
-    input.disabled = true;
-
-    var body = JSON.stringify({
-      messages: conversation,
-      pageContext: getPageContext()
-    });
-
-    fetch(AI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: body
     })
-      .then(function (res) {
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
+      .then(function (res) { return res.json(); })
       .then(function (data) {
         removeTyping();
         sendBtn.disabled = false;
         input.disabled = false;
 
-        var reply = data.reply || "Sorry, I had trouble with that. You can always call us at (229) 924-0035.";
-        addMessage(reply, "bot");
-        conversation.push({ role: "assistant", content: reply });
+        if (data.error) {
+          addMessage("Something went wrong. Please call us at (229) 924-0035.", "bot");
+          return;
+        }
+
+        chatId = data.chatId;
+        chatMode = "waiting";
+        conversation.push({ role: "visitor", content: msg, ts: Date.now() });
+        lastPollTs = Date.now() - 1000; /* catch any messages from creation */
         saveSession();
 
-        /* TODO: re-enable lead capture on Monday
-        if (data.action === "capture_lead") {
-          startLeadCapture();
-        }
-        */
-
+        addMessage("Connecting you with our team — one moment!", "bot");
+        startPolling();
         input.focus();
       })
       .catch(function () {
         removeTyping();
         sendBtn.disabled = false;
         input.disabled = false;
-        aiAvailable = false;
-        /* Fall back to offline keyword matching */
-        handleOfflineReply(userMsg);
+        /* Offline fallback */
+        var reply = offlineReply(msg);
+        addMessage(reply, "bot");
+        input.focus();
       });
   }
 
-  function handleOfflineReply(userMsg) {
-    showTyping();
-    setTimeout(function () {
-      removeTyping();
-      var result = offlineReply(userMsg);
-      addMessage(result.reply, "bot");
-      conversation.push({ role: "assistant", content: result.reply });
-      saveSession();
-      /* TODO: re-enable lead capture on Monday
-      if (result.action === "capture_lead") {
-        startLeadCapture();
-      }
-      */
-      input.focus();
-    }, 600);
+  /* ── Send a follow-up message ── */
+  function sendMessage(msg) {
+    conversation.push({ role: "visitor", content: msg, ts: Date.now() });
+    saveSession();
+
+    if (chatMode === "ai") {
+      showTyping();
+      sendBtn.disabled = true;
+      input.disabled = true;
+    }
+
+    fetch(API_BASE + "/api/chat/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: chatId, message: msg })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (chatMode === "ai") {
+          removeTyping();
+          sendBtn.disabled = false;
+          input.disabled = false;
+        }
+
+        if (data.messages) {
+          for (var i = 0; i < data.messages.length; i++) {
+            var m = data.messages[i];
+            conversation.push(m);
+            addMessage(m.content, "bot");
+            lastPollTs = Math.max(lastPollTs, m.ts);
+          }
+        }
+
+        if (data.leadCapture && !leadMode) {
+          setTimeout(function () {
+            startLeadCapture("Can I get your contact info so our team can follow up with you?");
+          }, 1000);
+        }
+
+        saveSession();
+        input.focus();
+      })
+      .catch(function () {
+        if (chatMode === "ai") {
+          removeTyping();
+          sendBtn.disabled = false;
+          input.disabled = false;
+        }
+        input.focus();
+      });
   }
 
-  /* ── Lead capture mode ── */
+  /* ── Polling for new messages ── */
+  function startPolling() {
+    if (pollInterval) return;
+    pollInterval = setInterval(poll, POLL_MS);
+  }
+
+  function stopPolling() {
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+  }
+
+  function poll() {
+    if (!chatId) return;
+
+    fetch(API_BASE + "/api/chat/poll/" + chatId + "?since=" + lastPollTs)
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.error) return;
+
+        /* Status change */
+        if (data.status && data.status !== chatMode) {
+          chatMode = data.status;
+          saveSession();
+        }
+
+        /* New messages */
+        if (data.messages && data.messages.length > 0) {
+          for (var i = 0; i < data.messages.length; i++) {
+            var m = data.messages[i];
+            /* Avoid duplicates — check if we already have this message */
+            var isDupe = false;
+            for (var j = 0; j < conversation.length; j++) {
+              if (conversation[j].ts === m.ts && conversation[j].role === m.role) {
+                isDupe = true;
+                break;
+              }
+            }
+            if (!isDupe) {
+              conversation.push(m);
+              if (m.role !== "visitor") {
+                addMessage(m.content, "bot");
+              }
+            }
+            lastPollTs = Math.max(lastPollTs, m.ts);
+          }
+          saveSession();
+        }
+
+        /* Lead capture trigger from server */
+        if (data.leadCapture && !leadMode) {
+          setTimeout(function () {
+            startLeadCapture("Can I get your contact info so our team can follow up with you?");
+          }, 1000);
+        }
+
+        /* Stop polling if chat is closed */
+        if (data.status === "closed") {
+          stopPolling();
+        }
+      })
+      .catch(function () { /* silent fail on poll */ });
+  }
+
+  /* ── Lead capture ── */
   function startLeadCapture(intro) {
     leadMode = true;
     leadStep = 0;
     leadData = {};
 
-    /* Auto-populate machine from page URL */
     var pageMachine = getMachineFromPage();
     if (pageMachine) leadData.machine = pageMachine;
-
-    /* Try to extract machine from conversation context */
-    if (!leadData.machine) {
-      var pageCtx = getPageContext();
-      if (pageCtx.indexOf("SANY") !== -1) {
-        var match = pageCtx.match(/SANY (\S+)/);
-        if (match) leadData.machine = match[1];
-      }
-    }
-
-    /* Extract intent from conversation context */
-    var lastMsgs = conversation.slice(-4).map(function (m) { return m.content.toLowerCase(); }).join(" ");
-    if (lastMsgs.indexOf("rent") !== -1) {
-      leadData.intent = "Rental";
-    } else if (lastMsgs.indexOf("buy") !== -1 || lastMsgs.indexOf("purchas") !== -1 || lastMsgs.indexOf("quote") !== -1) {
-      leadData.intent = "Purchase";
-    }
 
     if (intro) {
       addMessage(intro + " " + leadSteps[0].msg, "bot");
@@ -523,90 +489,52 @@
 
   function submitLead() {
     input.type = "text";
-    addMessage("Thanks, " + leadData.first_name + "! Let me send this to our team...", "bot");
-    inputArea.style.display = "none";
+    input.placeholder = "Type your message...";
+    addMessage("Thanks, " + leadData.first_name + "! Sending this to our team...", "bot");
 
-    var form = new FormData();
-    form.append("first_name", leadData.first_name || "");
-    form.append("last_name", leadData.last_name || "");
-    form.append("phone", leadData.phone || "");
-    form.append("email", leadData.email || "");
-    form.append("machine", leadData.machine || "Not specified");
-    form.append("intent", leadData.intent || "Not sure yet");
-    form.append("timeline", "");
-    form.append("message", summarizeConversation());
-    form.append("interest", leadData.intent === "Rental" ? "Equipment Rental" : "New Equipment Purchase");
-    form.append("source", "ai-chatbot");
-
-    function doSubmit(formData) {
-      fetch(LEAD_ENDPOINT, { method: "POST", body: formData })
-        .then(function (res) {
-          if (res.ok) {
-            addMessage("All set! Our team will reach out to you shortly. You can also call us anytime at (229) 924-0035.", "bot");
-          } else {
-            addMessage("Something went wrong. Please call us at (229) 924-0035 and we'll help you right away.", "bot");
-          }
-          leadMode = false;
-          inputArea.style.display = "flex";
-          saveSession();
-          input.focus();
-        })
-        .catch(function () {
-          addMessage("Something went wrong. Please call us at (229) 924-0035 and we'll help you right away.", "bot");
-          leadMode = false;
-          inputArea.style.display = "flex";
-          saveSession();
-          input.focus();
-        });
-    }
-
-    if (typeof grecaptcha !== "undefined") {
-      grecaptcha.ready(function () {
-        grecaptcha.execute(RECAPTCHA_KEY, { action: "chatbot" }).then(function (token) {
-          form.append("g-recaptcha-response", token);
-          doSubmit(form);
-        });
+    /* Submit lead data to worker */
+    fetch(API_BASE + "/api/chat/lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chatId: chatId,
+        first_name: leadData.first_name || "",
+        last_name: leadData.last_name || "",
+        phone: leadData.phone || "",
+        email: leadData.email || ""
+      })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function () {
+        addMessage("All set! Our team will reach out to you shortly. You can also call us anytime at (229) 924-0035. Feel free to keep chatting if you have more questions!", "bot");
+        leadMode = false;
+        saveSession();
+        input.focus();
+      })
+      .catch(function () {
+        addMessage("Something went wrong, but don't worry — call us at (229) 924-0035 and we'll help you right away.", "bot");
+        leadMode = false;
+        saveSession();
+        input.focus();
       });
-    } else {
-      doSubmit(form);
-    }
   }
 
-  function summarizeConversation() {
-    if (conversation.length === 0) return "";
-    return conversation.map(function (m) {
-      return (m.role === "user" ? "Visitor" : "Bot") + ": " + m.content;
-    }).join("\n");
+  /* ── Chat close / transcript ── */
+  function sendChatClose() {
+    if (logSent || !chatId) return;
+    logSent = true;
+    fetch(API_BASE + "/api/chat/close", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: chatId })
+    }).catch(function () {});
+    stopPolling();
   }
-
-  /* ── Handoff from Tawk.to: open chatbot and send the visitor's message to AI ── */
-  function handleHandoff(msg) {
-    /* Make sure UI is open */
-    container.style.display = "flex";
-    bubble.style.display = "none";
-    if (!opened) {
-      opened = true;
-      addMessage("No worries — I'm an AI assistant and I can help! Let me look into that for you.", "bot");
-    }
-    /* Send the visitor's original message to Claude */
-    if (msg) {
-      addMessage(msg, "user");
-      sendToAI(msg);
-    }
-  }
-
-  /* Expose handoff function globally so chat.js can call it */
-  window.__pbe_chatbot_handoff = handleHandoff;
 
   /* ── Init ── */
   function init() {
     build();
-    /* Check if we were loaded as a handoff from Tawk.to */
-    if (window.__pbe_handoff_message) {
-      var msg = window.__pbe_handoff_message;
-      delete window.__pbe_handoff_message;
-      handleHandoff(msg);
-    }
+    window.addEventListener("beforeunload", sendChatClose);
   }
 
   if (document.readyState === "loading") {
