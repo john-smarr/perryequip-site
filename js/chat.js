@@ -40,8 +40,8 @@
       }
     };
 
-    /* Visitor opened the chat widget — start the 1-minute countdown */
-    window.Tawk_API.onChatMaximized = function () {
+    /* Visitor sent first message — start the 1-minute countdown */
+    window.Tawk_API.onChatStarted = function () {
       if (!agentJoined && !waitTimer) {
         waitTimer = setTimeout(function () {
           if (!agentJoined) {
