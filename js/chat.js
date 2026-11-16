@@ -6,13 +6,14 @@
   var TAWKTO_PROPERTY_ID = "6af5ff0bd30fa33c3df15025";
   var TAWKTO_WIDGET_ID = "1k78eohsm";
 
-  var AGENT_TIMEOUT_MS = 60000; /* 1 minute for an agent to join */
+  var AGENT_TIMEOUT_MS = 30000; /* 30 seconds for an agent to join */
 
   var aiChatLoaded = false;
   var tawkReady = false;
   var currentMode = null; /* "tawk" or "ai" */
   var agentJoined = false;
   var waitTimer = null;
+  var visitorMessages = []; /* messages the visitor sent in Tawk.to */
 
   /* ── Load Tawk.to ── */
   function loadTawk() {
@@ -40,13 +41,18 @@
       }
     };
 
+    /* Capture every message the visitor sends in Tawk.to */
+    window.Tawk_API.onChatMessageVisitor = function (msg) {
+      visitorMessages.push(msg.message || msg);
+    };
+
     /* Visitor sent first message — start the 1-minute countdown */
     window.Tawk_API.onChatStarted = function () {
       if (!agentJoined && !waitTimer) {
         waitTimer = setTimeout(function () {
           if (!agentJoined) {
             try { window.Tawk_API.endChat(); } catch (e) {}
-            showAIChat();
+            handoffToAI();
           }
         }, AGENT_TIMEOUT_MS);
       }
@@ -115,6 +121,30 @@
     }
     var aiWidget = document.getElementById("pbe-chat");
     if (aiWidget) aiWidget.style.display = "block";
+  }
+
+  /* ── Seamless handoff: hide Tawk.to, open AI chatbot with visitor's message ── */
+  function handoffToAI() {
+    currentMode = "ai";
+    try { window.Tawk_API.hideWidget(); } catch (e) {}
+
+    /* Store the visitor's message so chatbot.js can pick it up */
+    var msg = visitorMessages.length > 0 ? visitorMessages.join("\n") : "";
+    if (msg) {
+      window.__pbe_handoff_message = msg;
+    }
+
+    if (!aiChatLoaded) {
+      loadAIChatbot();
+      aiChatLoaded = true;
+    } else {
+      /* Chatbot already loaded — trigger handoff directly */
+      var aiWidget = document.getElementById("pbe-chat");
+      if (aiWidget) aiWidget.style.display = "block";
+      if (typeof window.__pbe_chatbot_handoff === "function") {
+        window.__pbe_chatbot_handoff(msg);
+      }
+    }
   }
 
   /* ── Dynamically load the AI chatbot script ── */

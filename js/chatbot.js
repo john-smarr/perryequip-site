@@ -473,9 +473,34 @@
     }).join("\n");
   }
 
+  /* ── Handoff from Tawk.to: open chatbot and send the visitor's message to AI ── */
+  function handleHandoff(msg) {
+    /* Make sure UI is open */
+    container.style.display = "flex";
+    bubble.style.display = "none";
+    if (!opened) {
+      opened = true;
+      addMessage("No worries — I'm an AI assistant and I can help! Let me look into that for you.", "bot");
+    }
+    /* Send the visitor's original message to Claude */
+    if (msg) {
+      addMessage(msg, "user");
+      sendToAI(msg);
+    }
+  }
+
+  /* Expose handoff function globally so chat.js can call it */
+  window.__pbe_chatbot_handoff = handleHandoff;
+
   /* ── Init ── */
   function init() {
     build();
+    /* Check if we were loaded as a handoff from Tawk.to */
+    if (window.__pbe_handoff_message) {
+      var msg = window.__pbe_handoff_message;
+      delete window.__pbe_handoff_message;
+      handleHandoff(msg);
+    }
   }
 
   if (document.readyState === "loading") {
