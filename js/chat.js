@@ -13,6 +13,7 @@
   var currentMode = null; /* "tawk" or "ai" */
   var agentJoined = false;
   var waitTimer = null;
+  var handingOff = false; /* true during Tawk→AI transition */
   var visitorMessages = []; /* messages the visitor sent in Tawk.to */
 
   /* ── Load Tawk.to ── */
@@ -51,6 +52,7 @@
       if (!agentJoined && !waitTimer) {
         waitTimer = setTimeout(function () {
           if (!agentJoined) {
+            handingOff = true;
             try { window.Tawk_API.endChat(); } catch (e) {}
             handoffToAI();
           }
@@ -74,7 +76,10 @@
         clearTimeout(waitTimer);
         waitTimer = null;
       }
-      checkStatus();
+      /* Don't reset back to Tawk if we're handing off to AI */
+      if (!handingOff) {
+        checkStatus();
+      }
     };
 
     /* Inject Tawk.to script */
