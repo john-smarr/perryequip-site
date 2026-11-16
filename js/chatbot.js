@@ -6,7 +6,7 @@
   var API_BASE = "https://raspy-cell-4751.lance-74b.workers.dev";
   var RECAPTCHA_KEY = "6LcLRRguAAAAAH6s6xE1CYlkVv6KsYYeyVbR8bgX";
   var SESSION_KEY = "pbe_chat_session";
-  var POLL_MS = 3000;
+  var POLL_MS = 2000;
 
   var container, messages, inputArea, widget, bubble, input, sendBtn;
   var chatId = null;
