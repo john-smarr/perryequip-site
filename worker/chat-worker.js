@@ -6,7 +6,7 @@ var CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
-var AGENT_TIMEOUT_MS = 30000; /* 30 seconds before AI fallback */
+var AGENT_TIMEOUT_MS = 60000; /* 60 seconds before AI fallback */
 
 /* ── Rate limiting (in-memory, resets on worker restart) ── */
 var rateLimitMap = {};

@@ -222,11 +222,20 @@
   }
 
   /* ── Message display ── */
+  function formatMessage(text) {
+    /* Simple markdown: **bold**, *italic*, newlines */
+    var escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    escaped = escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    escaped = escaped.replace(/\*(.+?)\*/g, "<em>$1</em>");
+    escaped = escaped.replace(/\n/g, "<br>");
+    return escaped;
+  }
+
   function addMessage(text, from, silent) {
     var div = document.createElement("div");
     div.className = "pbe-chat-msg pbe-chat-" + from;
     if (silent) div.style.animation = "none";
-    div.textContent = text;
+    div.innerHTML = formatMessage(text);
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
     return div;
@@ -401,21 +410,21 @@
           saveSession();
         }
 
-        /* New messages */
+        /* New messages — only display non-visitor messages (visitor messages already shown locally) */
         if (data.messages && data.messages.length > 0) {
           for (var i = 0; i < data.messages.length; i++) {
             var m = data.messages[i];
-            /* Avoid duplicates — check if we already have this message */
-            var isDupe = false;
-            for (var j = 0; j < conversation.length; j++) {
-              if (conversation[j].ts === m.ts && conversation[j].role === m.role) {
-                isDupe = true;
-                break;
+            if (m.role !== "visitor") {
+              /* Avoid duplicates by timestamp */
+              var isDupe = false;
+              for (var j = 0; j < conversation.length; j++) {
+                if (conversation[j].ts === m.ts && conversation[j].role === m.role) {
+                  isDupe = true;
+                  break;
+                }
               }
-            }
-            if (!isDupe) {
-              conversation.push(m);
-              if (m.role !== "visitor") {
+              if (!isDupe) {
+                conversation.push(m);
                 addMessage(m.content, "bot");
               }
             }
