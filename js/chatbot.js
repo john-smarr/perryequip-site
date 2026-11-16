@@ -317,6 +317,7 @@
         saveSession();
 
         addMessage("Connecting you with our team — one moment!", "bot");
+        showTyping(); /* show typing dots while waiting for agent */
         startPolling();
         input.focus();
       })
@@ -412,6 +413,7 @@
 
         /* New messages — only display non-visitor messages (visitor messages already shown locally) */
         if (data.messages && data.messages.length > 0) {
+          var hasNew = false;
           for (var i = 0; i < data.messages.length; i++) {
             var m = data.messages[i];
             if (m.role !== "visitor") {
@@ -424,6 +426,7 @@
                 }
               }
               if (!isDupe) {
+                if (!hasNew) { removeTyping(); hasNew = true; }
                 conversation.push(m);
                 addMessage(m.content, "bot");
               }
