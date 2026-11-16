@@ -16,6 +16,11 @@
   var leadStep = 0;
   var opened = false;
   var aiAvailable = true; /* will flip to false if API fails */
+  var waitingForAgent = false;
+  var agentTimer = null;
+  var pendingMessage = "";
+  var logSent = false;
+  var AGENT_WAIT_MS = 30000; /* 30 seconds for an agent to respond */
 
   var leadSteps = [
     { msg: "Great! What's your first name?", field: "first_name", type: "text" },
@@ -139,7 +144,7 @@
 
   function restoreMessages() {
     /* Replay the greeting */
-    addMessage("Hey there! Our team is away right now, but I can answer questions about our equipment, services, rentals, locations, and more. How can I help?", "bot", true);
+    addMessage("Hey there! How can we help you today?", "bot", true);
     /* Replay conversation */
     for (var i = 0; i < conversation.length; i++) {
       addMessage(conversation[i].content, conversation[i].role === "user" ? "user" : "bot", true);
@@ -192,7 +197,7 @@
         if (hasSession) {
           restoreMessages();
         } else {
-          addMessage("Hey there! Our team is away right now, but I can answer questions about our equipment, services, rentals, locations, and more. How can I help?", "bot");
+          addMessage("Hey there! How can we help you today?", "bot");
           /* TODO: re-enable on Monday — addQuoteButton(); */
         }
       }
@@ -202,7 +207,11 @@
     widget.querySelector(".pbe-chat-close").onclick = function () {
       container.style.display = "none";
       bubble.style.display = "flex";
+      sendChatLog();
     };
+
+    /* Send chat log if visitor navigates away */
+    window.addEventListener("beforeunload", sendChatLog);
 
     sendBtn.onclick = function () { handleSend(); };
     input.addEventListener("keydown", function (e) {
@@ -270,9 +279,106 @@
 
     if (leadMode) {
       handleLeadInput(val);
+    } else if (waitingForAgent) {
+      /* Still waiting for agent — queue the message */
+      conversation.push({ role: "user", content: val });
+      saveSession();
+    } else if (conversation.length === 0) {
+      /* First message — notify agents and wait 30s */
+      pendingMessage = val;
+      conversation.push({ role: "user", content: val });
+      saveSession();
+      startAgentWait();
     } else {
       sendToAI(val);
     }
+  }
+
+  /* ── Agent wait: 30s for a live agent, then Claude takes over ── */
+  function startAgentWait() {
+    waitingForAgent = true;
+    addMessage("Connecting you with an agent — one moment please!", "bot");
+    notifyAgents(pendingMessage);
+    agentTimer = setTimeout(agentTimeout, AGENT_WAIT_MS);
+  }
+
+  function agentTimeout() {
+    waitingForAgent = false;
+    agentTimer = null;
+
+    /* Claude takes over seamlessly */
+    var apology = "I'm sorry, no agents are available right now. Let me see what I can do!";
+    addMessage(apology, "bot");
+    conversation.push({ role: "assistant", content: apology });
+    saveSession();
+
+    /* Send all queued messages to Claude */
+    var typing = showTyping();
+    sendBtn.disabled = true;
+    input.disabled = true;
+
+    fetch(AI_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: conversation, pageContext: getPageContext() })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        removeTyping();
+        sendBtn.disabled = false;
+        input.disabled = false;
+        var reply = data.reply || "Sorry, I had trouble with that. You can always call us at (229) 924-0035.";
+        addMessage(reply, "bot");
+        conversation.push({ role: "assistant", content: reply });
+        saveSession();
+        /* Collect contact info so agents can follow up */
+        setTimeout(function () {
+          startLeadCapture("I'd also love to get your info so our team can follow up with you!");
+        }, 1000);
+      })
+      .catch(function () {
+        removeTyping();
+        sendBtn.disabled = false;
+        input.disabled = false;
+        aiAvailable = false;
+        var result = offlineReply(pendingMessage);
+        addMessage(result.reply, "bot");
+        conversation.push({ role: "assistant", content: result.reply });
+        saveSession();
+        setTimeout(function () {
+          startLeadCapture("I'd love to get your info so our team can follow up with you!");
+        }, 1000);
+      });
+  }
+
+  function notifyAgents(msg) {
+    fetch(AI_ENDPOINT.replace("/api/chat", "/api/notify"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: msg,
+        page: window.location.href,
+        timestamp: new Date().toISOString()
+      })
+    }).catch(function () {}); /* fire and forget */
+  }
+
+  function sendChatLog() {
+    if (logSent || conversation.length === 0) return;
+    logSent = true;
+    fetch(AI_ENDPOINT.replace("/api/chat", "/api/chat-log"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversation: conversation,
+        leadData: leadData,
+        page: window.location.href,
+        timestamp: new Date().toISOString()
+      })
+    }).catch(function () {});
   }
 
   /* ── AI conversation ── */

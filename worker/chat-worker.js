@@ -109,6 +109,86 @@ async function handleChat(request, env) {
   }
 }
 
+async function handleNotify(request, env) {
+  try {
+    var body = await request.json();
+    var msg = body.message || "New chat started";
+    var page = body.page || "Unknown page";
+    var timestamp = body.timestamp || new Date().toISOString();
+
+    var emailBody = "New chat on perryequip.com!\n\n" +
+      "Time: " + timestamp + "\n" +
+      "Page: " + page + "\n\n" +
+      "Visitor says:\n" + msg;
+
+    await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + env.SENDGRID_API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: "randi@perrybrothersoil.com" }, { email: "matthew@perryequip.com" }] }],
+        from: { email: "noreply@perryequip.com", name: "Perry Brothers Chat" },
+        subject: "New website chat: " + msg.slice(0, 50),
+        content: [{ type: "text/plain", value: emailBody }]
+      })
+    });
+
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    console.log("Notify error: " + err.message);
+    return jsonResponse({ ok: true }); /* don't block the visitor */
+  }
+}
+
+async function handleChatLog(request, env) {
+  try {
+    var body = await request.json();
+    var convo = body.conversation || [];
+    var lead = body.leadData || {};
+    var page = body.page || "Unknown page";
+    var timestamp = body.timestamp || new Date().toISOString();
+
+    if (convo.length === 0) return jsonResponse({ ok: true });
+
+    var transcript = convo.map(function (m) {
+      return (m.role === "user" ? "Visitor" : "Bot") + ": " + m.content;
+    }).join("\n\n");
+
+    var emailBody = "Chat transcript from perryequip.com\n\n" +
+      "Time: " + timestamp + "\n" +
+      "Page: " + page + "\n";
+
+    if (lead.first_name) {
+      emailBody += "Contact: " + lead.first_name + " " + (lead.last_name || "") + "\n";
+      if (lead.phone) emailBody += "Phone: " + lead.phone + "\n";
+      if (lead.email) emailBody += "Email: " + lead.email + "\n";
+    }
+
+    emailBody += "\n--- Conversation ---\n\n" + transcript;
+
+    await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + env.SENDGRID_API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: "randi@perrybrothersoil.com" }, { email: "matthew@perryequip.com" }] }],
+        from: { email: "noreply@perryequip.com", name: "Perry Brothers Chat" },
+        subject: "Chat transcript" + (lead.first_name ? " — " + lead.first_name + " " + (lead.last_name || "") : ""),
+        content: [{ type: "text/plain", value: emailBody }]
+      })
+    });
+
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    console.log("Chat log error: " + err.message);
+    return jsonResponse({ ok: true });
+  }
+}
+
 async function handleLeadForm(request, env) {
   var formData = await request.formData();
   var recaptchaResponse = formData.get('g-recaptcha-response');
@@ -185,6 +265,14 @@ export default {
 
     if (url.pathname === "/api/chat" && request.method === "POST") {
       return handleChat(request, env);
+    }
+
+    if (url.pathname === "/api/notify" && request.method === "POST") {
+      return handleNotify(request, env);
+    }
+
+    if (url.pathname === "/api/chat-log" && request.method === "POST") {
+      return handleChatLog(request, env);
     }
 
     if (request.method === "POST") {
