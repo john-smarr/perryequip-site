@@ -6,9 +6,13 @@
   var TAWKTO_PROPERTY_ID = "6af5ff0bd30fa33c3df15025";
   var TAWKTO_WIDGET_ID = "1k78eohsm";
 
+  var AGENT_TIMEOUT_MS = 60000; /* 1 minute for an agent to join */
+
   var aiChatLoaded = false;
   var tawkReady = false;
   var currentMode = null; /* "tawk" or "ai" */
+  var agentJoined = false;
+  var waitTimer = null;
 
   /* ── Load Tawk.to ── */
   function loadTawk() {
@@ -36,8 +40,34 @@
       }
     };
 
-    /* When a live chat ends, re-check status */
+    /* Visitor opened the chat widget — start the 1-minute countdown */
+    window.Tawk_API.onChatMaximized = function () {
+      if (!agentJoined && !waitTimer) {
+        waitTimer = setTimeout(function () {
+          if (!agentJoined) {
+            try { window.Tawk_API.endChat(); } catch (e) {}
+            showAIChat();
+          }
+        }, AGENT_TIMEOUT_MS);
+      }
+    };
+
+    /* An agent joined — cancel the timeout */
+    window.Tawk_API.onAgentJoinChat = function () {
+      agentJoined = true;
+      if (waitTimer) {
+        clearTimeout(waitTimer);
+        waitTimer = null;
+      }
+    };
+
+    /* When a live chat ends, reset state and re-check status */
     window.Tawk_API.onChatEnded = function () {
+      agentJoined = false;
+      if (waitTimer) {
+        clearTimeout(waitTimer);
+        waitTimer = null;
+      }
       checkStatus();
     };
 
