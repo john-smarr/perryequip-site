@@ -13,6 +13,7 @@
   var chatMode = null; /* "waiting", "agent", "ai" */
   var pollInterval = null;
   var lastPollTs = 0;
+  var agentTimer = null; /* client-side timeout for AI fallback */
   var conversation = []; /* local copy for display */
   var leadData = {};
   var leadMode = false;
@@ -319,6 +320,8 @@
         addMessage("Connecting you with our team — one moment!", "bot");
         showTyping(); /* show typing dots while waiting for agent */
         startPolling();
+        /* Start client-side timeout — if no agent responds in 60s, trigger AI */
+        agentTimer = setTimeout(triggerAITakeover, 60000);
         input.focus();
       })
       .catch(function () {
@@ -384,6 +387,47 @@
       });
   }
 
+  /* ── AI takeover — triggered by client-side timer ── */
+  function triggerAITakeover() {
+    agentTimer = null;
+    if (chatMode !== "waiting") return; /* agent already joined */
+
+    removeTyping();
+
+    fetch(API_BASE + "/api/chat/ai-takeover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: chatId })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.alreadyHandled) return; /* agent responded between timer and request */
+
+        chatMode = data.status || "ai";
+
+        if (data.messages) {
+          for (var i = 0; i < data.messages.length; i++) {
+            var m = data.messages[i];
+            conversation.push(m);
+            addMessage(m.content, "bot");
+            lastPollTs = Math.max(lastPollTs, m.ts);
+          }
+        }
+
+        if (data.leadCapture && !leadMode) {
+          setTimeout(function () {
+            startLeadCapture("Can I get your contact info so our team can follow up with you?");
+          }, 1000);
+        }
+
+        saveSession();
+      })
+      .catch(function () {
+        /* Offline fallback */
+        addMessage("I'm sorry, no agents are available right now. Please call us at (229) 924-0035.", "bot");
+      });
+  }
+
   /* ── Polling for new messages ── */
   function startPolling() {
     if (pollInterval) return;
@@ -405,8 +449,12 @@
       .then(function (data) {
         if (data.error) return;
 
-        /* Status change */
+        /* Status change — cancel AI timer if agent joined */
         if (data.status && data.status !== chatMode) {
+          if (data.status === "agent" && agentTimer) {
+            clearTimeout(agentTimer);
+            agentTimer = null;
+          }
           chatMode = data.status;
           saveSession();
         }

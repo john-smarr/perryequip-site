@@ -271,44 +271,6 @@ async function handleChatPoll(chatId, since, env) {
     var chat = await readChat(chatId, env);
     if (!chat) return jsonResponse({ error: "Chat not found" }, 404);
 
-    var now = Date.now();
-    var statusChanged = false;
-
-    /* 30-second AI fallback: if waiting and timed out, Claude takes over */
-    if (chat.status === "waiting" && now - chat.lastVisitorMessageAt >= AGENT_TIMEOUT_MS) {
-      chat.status = "ai";
-      statusChanged = true;
-
-      /* Add system transition message */
-      chat.messages.push({
-        role: "system",
-        content: "I'm sorry, no agents are available right now. Let me help!",
-        ts: now
-      });
-
-      /* Call Claude with the conversation */
-      var aiResult = await callClaude(chat.messages, chat.pageContext, env);
-      if (aiResult) {
-        chat.messages.push({
-          role: "ai",
-          content: aiResult.reply,
-          ts: now + 1
-        });
-        if (aiResult.action === "capture_lead") {
-          chat.leadCaptureNeeded = true;
-        }
-      } else {
-        chat.messages.push({
-          role: "ai",
-          content: "I'm having trouble right now. Please call us at (229) 924-0035 and we'll help you right away.",
-          ts: now + 1
-        });
-      }
-
-      await writeChat(chat, env);
-      await updateActiveChats(chat, env);
-    }
-
     /* Filter messages newer than 'since' */
     var newMessages = [];
     for (var i = 0; i < chat.messages.length; i++) {
@@ -325,6 +287,56 @@ async function handleChatPoll(chatId, since, env) {
   } catch (err) {
     console.log("chat/poll error: " + err.message);
     return jsonResponse({ error: "Poll failed" }, 500);
+  }
+}
+
+/* POST /api/chat/ai-takeover — Client triggers AI fallback after timeout */
+async function handleAITakeover(request, env) {
+  try {
+    var body = await request.json();
+    var chatId = body.chatId;
+    if (!chatId) return jsonResponse({ error: "Missing chatId" }, 400);
+
+    var chat = await readChat(chatId, env);
+    if (!chat) return jsonResponse({ error: "Chat not found" }, 404);
+
+    /* Only take over if still waiting — if agent already responded, skip */
+    if (chat.status !== "waiting") {
+      return jsonResponse({ status: chat.status, messages: [], alreadyHandled: true });
+    }
+
+    var now = Date.now();
+    chat.status = "ai";
+
+    chat.messages.push({
+      role: "system",
+      content: "I'm sorry, no agents are available right now. Let me help!",
+      ts: now
+    });
+
+    var aiResult = await callClaude(chat.messages, chat.pageContext, env);
+    var newMessages = [chat.messages[chat.messages.length - 1]];
+
+    if (aiResult) {
+      var aiMsg = { role: "ai", content: aiResult.reply, ts: now + 1 };
+      chat.messages.push(aiMsg);
+      newMessages.push(aiMsg);
+      if (aiResult.action === "capture_lead") {
+        chat.leadCaptureNeeded = true;
+      }
+    } else {
+      var fallbackMsg = { role: "ai", content: "I'm having trouble right now. Please call us at (229) 924-0035 and we'll help you right away.", ts: now + 1 };
+      chat.messages.push(fallbackMsg);
+      newMessages.push(fallbackMsg);
+    }
+
+    await writeChat(chat, env);
+    await updateActiveChats(chat, env);
+
+    return jsonResponse({ status: "ai", messages: newMessages, leadCapture: chat.leadCaptureNeeded || false });
+  } catch (err) {
+    console.log("ai-takeover error: " + err.message);
+    return jsonResponse({ error: "Failed" }, 500);
   }
 }
 
@@ -680,6 +692,9 @@ export default {
       var chatId = path.replace("/api/chat/poll/", "");
       var since = parseInt(url.searchParams.get("since") || "0");
       return handleChatPoll(chatId, since, env);
+    }
+    if (path === "/api/chat/ai-takeover" && method === "POST") {
+      return handleAITakeover(request, env);
     }
     if (path === "/api/chat/lead" && method === "POST") {
       return handleChatLead(request, env);
