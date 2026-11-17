@@ -381,9 +381,7 @@
       var lastMsg = chat.messages[chat.messages.length - 1];
       if (lastMsg.role === "visitor") {
         playAlert();
-        if (!document.hasFocus()) {
-          startTitleBlink("New Message");
-        }
+        startTitleBlink("New Message");
       }
     }
 
