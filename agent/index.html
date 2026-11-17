@@ -45,7 +45,15 @@
     .chat-time { font-size: 12px; color: #999; }
     .chat-preview { font-size: 14px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
     .chat-page { font-size: 12px; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-tabs { display: flex; border-bottom: 1px solid #ddd; }
+    .chat-tab { flex: 1; padding: 10px; border: none; background: #f5f5f5; cursor: pointer; font-size: 14px; font-weight: 600; color: #777; }
+    .chat-tab.active { background: #fff; color: #ea0000; border-bottom: 2px solid #ea0000; }
+    .chat-tab:hover { color: #333; }
     .no-chats { padding: 40px 20px; text-align: center; color: #999; font-size: 14px; }
+    .chat-header-actions { display: flex; align-items: center; gap: 8px; }
+    .chat-expiry { font-size: 12px; color: #999; }
+    #keep-chat-btn { background: #d4edda; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #155724; }
+    #keep-chat-btn:hover { background: #c3e6cb; }
 
     /* ── Chat View ── */
     #chat-view { flex: 1; display: none; flex-direction: column; }
@@ -107,6 +115,10 @@
   </header>
   <div id="main">
     <div id="chat-list">
+      <div class="chat-tabs">
+        <button class="chat-tab active" id="tab-active">Active</button>
+        <button class="chat-tab" id="tab-closed">Closed</button>
+      </div>
       <div class="no-chats" id="no-chats-msg">No active chats</div>
     </div>
     <div id="chat-view">
@@ -115,7 +127,11 @@
           <button id="back-btn">&larr; Back</button>
           <span id="chat-header-info"></span>
         </div>
-        <button id="close-chat-btn">Close Chat</button>
+        <div class="chat-header-actions">
+          <span id="chat-expiry" class="chat-expiry"></span>
+          <button id="keep-chat-btn" style="display:none">Keep 30 More Days</button>
+          <button id="close-chat-btn">Close Chat</button>
+        </div>
       </div>
       <div id="chat-messages"></div>
       <div id="chat-reply">
@@ -139,6 +155,8 @@
   var chatPollInterval = null;
   var listPollInterval = null;
   var audioCtx = null;
+  var showingClosed = false;
+  var allChats = [];
   var originalTitle = document.title;
   var titleBlink = null;
   var titleBlinking = false;
@@ -161,7 +179,11 @@
   var replyInput = document.getElementById("reply-input");
   var replyBtn = document.getElementById("reply-btn");
   var closeChatBtn = document.getElementById("close-chat-btn");
+  var keepChatBtn = document.getElementById("keep-chat-btn");
+  var chatExpiry = document.getElementById("chat-expiry");
   var backBtn = document.getElementById("back-btn");
+  var tabActive = document.getElementById("tab-active");
+  var tabClosed = document.getElementById("tab-closed");
 
   /* ── Audio alert ── */
   function playAlert() {
@@ -278,13 +300,13 @@
     apiFetch("/api/agent/chats")
       .then(function (data) {
         if (!data.chats) return;
-        renderChatList(data.chats);
+        allChats = data.chats;
+        renderFilteredChats();
 
         /* Check for new waiting chats */
         for (var i = 0; i < data.chats.length; i++) {
           var c = data.chats[i];
           if (c.status === "waiting" && !knownChatIds[c.id]) {
-            /* New chat! Notify */
             playAlert();
             if ("Notification" in window && Notification.permission === "granted") {
               new Notification("New chat!", { body: c.firstMessage || "Visitor needs help", icon: "/favicon.ico" });
@@ -296,8 +318,15 @@
       .catch(function () {});
   }
 
+  function renderFilteredChats() {
+    var filtered = allChats.filter(function (c) {
+      return showingClosed ? c.status === "closed" : c.status !== "closed";
+    });
+    renderChatList(filtered);
+  }
+
   function renderChatList(chats) {
-    /* Keep the no-chats message, remove chat cards */
+    /* Keep the tabs and no-chats message, remove chat cards */
     var cards = chatListEl.querySelectorAll(".chat-card");
     for (var i = 0; i < cards.length; i++) cards[i].remove();
 
@@ -371,6 +400,20 @@
     var pagePath = "";
     try { pagePath = new URL(chat.visitorPage).pathname; } catch (e) { pagePath = chat.visitorPage; }
     chatHeaderInfo.innerHTML = '<strong>' + escapeHtml(chat.status.toUpperCase()) + '</strong> &middot; ' + escapeHtml(pagePath) + ' &middot; ' + getTimeAgo(chat.createdAt);
+
+    /* Show/hide keep button and expiry for closed chats */
+    var chatSummary = allChats.find(function (c) { return c.id === chat.id; });
+    if (chat.status === "closed" && chatSummary && chatSummary.expiresAt) {
+      var daysLeft = Math.ceil((chatSummary.expiresAt - Date.now()) / 86400000);
+      chatExpiry.textContent = "Expires in " + daysLeft + " day" + (daysLeft !== 1 ? "s" : "");
+      chatExpiry.style.display = "inline";
+      keepChatBtn.style.display = "inline-block";
+      closeChatBtn.style.display = "none";
+    } else {
+      chatExpiry.style.display = "none";
+      keepChatBtn.style.display = "none";
+      closeChatBtn.style.display = "inline-block";
+    }
 
     /* Messages — only re-render if count changed */
     if (chatMessagesEl.dataset.count === String(chat.messages.length)) return;
@@ -491,6 +534,33 @@
   replyBtn.onclick = sendReply;
   replyInput.addEventListener("keydown", function (e) { if (e.key === "Enter") sendReply(); });
   closeChatBtn.onclick = closeChat;
+  keepChatBtn.onclick = function () {
+    if (!selectedChatId) return;
+    apiFetch("/api/agent/keep/" + selectedChatId, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: "{}"
+    }).then(function (data) {
+      if (data.ok) {
+        chatExpiry.textContent = "Expires in 30 days";
+        pollChatList();
+      }
+    });
+  };
+  tabActive.onclick = function () {
+    showingClosed = false;
+    tabActive.classList.add("active");
+    tabClosed.classList.remove("active");
+    noChatsMsg.textContent = "No active chats";
+    renderFilteredChats();
+  };
+  tabClosed.onclick = function () {
+    showingClosed = true;
+    tabClosed.classList.add("active");
+    tabActive.classList.remove("active");
+    noChatsMsg.textContent = "No closed chats";
+    renderFilteredChats();
+  };
   backBtn.onclick = function () {
     chatView.style.display = "none";
     noChat.style.display = "flex";

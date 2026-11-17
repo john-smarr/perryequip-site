@@ -54,7 +54,7 @@ async function readChat(chatId, env) {
 }
 
 async function writeChat(chat, env) {
-  await env.CHAT_KV.put("chat:" + chat.id, JSON.stringify(chat), { expirationTtl: 86400 });
+  await env.CHAT_KV.put("chat:" + chat.id, JSON.stringify(chat), { expirationTtl: 2592000 });
 }
 
 async function readActiveChats(env) {
@@ -67,22 +67,21 @@ async function updateActiveChats(chat, env) {
   var list = await readActiveChats(env);
   /* Remove existing entry for this chat */
   list = list.filter(function (c) { return c.id !== chat.id; });
-  /* Add updated summary */
-  if (chat.status !== "closed") {
-    list.unshift({
-      id: chat.id,
-      status: chat.status,
-      firstMessage: chat.messages.length > 0 ? chat.messages[0].content.slice(0, 100) : "",
-      visitorPage: chat.visitorPage,
-      createdAt: chat.createdAt,
-      lastActivity: Date.now(),
-      messageCount: chat.messages.length
-    });
-  }
-  /* Prune: keep only last 50 non-closed, remove anything older than 24h */
-  var cutoff = Date.now() - 86400000;
-  list = list.filter(function (c) { return c.lastActivity > cutoff; }).slice(0, 50);
-  await env.CHAT_KV.put("active_chats", JSON.stringify(list), { expirationTtl: 86400 });
+  /* Add updated summary (including closed chats) */
+  list.unshift({
+    id: chat.id,
+    status: chat.status,
+    firstMessage: chat.messages.length > 0 ? chat.messages[0].content.slice(0, 100) : "",
+    visitorPage: chat.visitorPage,
+    createdAt: chat.createdAt,
+    lastActivity: Date.now(),
+    messageCount: chat.messages.length,
+    expiresAt: Date.now() + 2592000000 /* 30 days from now */
+  });
+  /* Prune: keep last 200, remove anything older than 30 days */
+  var cutoff = Date.now() - 2592000000;
+  list = list.filter(function (c) { return c.lastActivity > cutoff; }).slice(0, 200);
+  await env.CHAT_KV.put("active_chats", JSON.stringify(list), { expirationTtl: 2592000 });
 }
 
 /* ── Auth helper ── */
@@ -503,6 +502,31 @@ async function handleAgentMessage(chatId, request, env) {
   }
 }
 
+/* POST /api/agent/keep/{chatId} — Extend chat retention another 30 days */
+async function handleAgentKeep(chatId, env) {
+  try {
+    var chat = await readChat(chatId, env);
+    if (!chat) return jsonResponse({ error: "Chat not found" }, 404);
+
+    /* Re-write with fresh 30-day TTL */
+    await writeChat(chat, env);
+
+    /* Update expiry in active_chats list */
+    var list = await readActiveChats(env);
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === chatId) {
+        list[i].expiresAt = Date.now() + 2592000000;
+        break;
+      }
+    }
+    await env.CHAT_KV.put("active_chats", JSON.stringify(list), { expirationTtl: 2592000 });
+
+    return jsonResponse({ ok: true, expiresAt: Date.now() + 2592000000 });
+  } catch (err) {
+    return jsonResponse({ error: "Failed to extend chat" }, 500);
+  }
+}
+
 /* POST /api/agent/close/{chatId} — Agent closes a chat */
 async function handleAgentClose(chatId, request, env) {
   try {
@@ -723,6 +747,12 @@ export default {
       if (authErr3) return authErr3;
       var msgChatId = path.replace("/api/agent/message/", "");
       return handleAgentMessage(msgChatId, request, env);
+    }
+    if (path.startsWith("/api/agent/keep/") && method === "POST") {
+      var authErr5 = requireAgent(request, env);
+      if (authErr5) return authErr5;
+      var keepChatId = path.replace("/api/agent/keep/", "");
+      return handleAgentKeep(keepChatId, env);
     }
     if (path.startsWith("/api/agent/close/") && method === "POST") {
       var authErr4 = requireAgent(request, env);
