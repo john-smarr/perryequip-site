@@ -62,6 +62,7 @@
     .msg-ai { background: #e8e8e8; color: #333; align-self: flex-start; border-bottom-left-radius: 4px; }
     .msg-system { background: none; color: #999; align-self: center; font-size: 13px; font-style: italic; padding: 4px; }
     .msg-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; opacity: 0.7; }
+    .msg-time { font-size: 10px; opacity: 0.5; margin-top: 4px; }
 
     #chat-reply { background: #fff; padding: 12px 16px; border-top: 1px solid #ddd; display: flex; gap: 8px; }
     #reply-input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; }
@@ -402,6 +403,11 @@
       text.textContent = m.content;
       div.appendChild(text);
 
+      var time = document.createElement("div");
+      time.className = "msg-time";
+      time.textContent = formatTime(m.ts);
+      div.appendChild(time);
+
       chatMessagesEl.appendChild(div);
     }
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
@@ -466,6 +472,15 @@
     if (diff < 3600) return Math.floor(diff / 60) + "m ago";
     if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
     return Math.floor(diff / 86400) + "d ago";
+  }
+
+  function formatTime(ts) {
+    var d = new Date(ts);
+    var h = d.getHours();
+    var min = d.getMinutes();
+    var ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    return h + ":" + (min < 10 ? "0" : "") + min + " " + ampm;
   }
 
   /* ── Event listeners ── */
