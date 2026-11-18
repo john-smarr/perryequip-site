@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18529593968"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'AW-18529593968');
+gtag('config', 'G-DGVY5FCB2R');
+</script>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Equipment Rentals | Perry Brothers Equipment Company</title>
+<meta name="description" content="Rent SANY heavy equipment in South Georgia and Alabama. Mini excavators, large excavators, motor graders, skid steers, telehandlers, wheel loaders, backhoes, and rollers.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="canonical" href="https://perryequip.com/rentals/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Equipment Rentals | Perry Brothers Equipment Company">
+  <meta property="og:description" content="Rent SANY heavy equipment in South Georgia and Alabama. Mini excavators, large excavators, motor graders, skid steers, telehandlers, wheel loaders, backhoes, and rollers.">
+  <meta property="og:url" content="https://perryequip.com/rentals/">
+  <meta property="og:site_name" content="Perry Brothers Equipment Company">
+  <meta property="og:image" content="https://perryequip.com/images/perry-logo.png">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://perryequip.com/"},
+      {"@type": "ListItem", "position": 2, "name": "Rentals", "item": "https://perryequip.com/rentals/"}
+    ]
+  }
+  </script>
+  <style>
+    .rental-cats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; max-width:1100px; margin:0 auto; }
+    .rental-cat { cursor:pointer; border-radius:12px; overflow:hidden; position:relative; aspect-ratio:4/3; background:#111; transition:transform .2s, box-shadow .2s; }
+    .rental-cat:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,.2); }
+    .rental-cat.active { outline:3px solid var(--red); outline-offset:2px; }
+    .rental-cat img { width:100%; height:100%; object-fit:cover; display:block; opacity:.8; transition:opacity .2s; }
+    .rental-cat:hover img { opacity:1; }
+    .rental-cat-label { position:absolute; bottom:0; left:0; right:0; padding:12px 14px; background:linear-gradient(transparent,rgba(0,0,0,.85)); color:#fff; font-weight:700; font-size:15px; }
+    .rental-machines { display:none; }
+    .rental-machines.show { display:block; }
+    .rental-machines-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .rental-machines-header h2 { font-family:var(--font-display); font-size:clamp(24px,4vw,36px); font-weight:900; }
+    .rental-machines-close { background:none; border:1px solid #ccc; padding:6px 16px; border-radius:6px; cursor:pointer; font-size:14px; color:#666; }
+    .rental-machines-close:hover { border-color:#333; color:#333; }
+    .rental-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:24px; }
+    .rental-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:box-shadow .2s; }
+    .rental-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.14); }
+    .rental-card img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+    .rental-card-body { padding:16px 20px 20px; }
+    .rental-card-brand { font-size:11px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.08em; }
+    .rental-card-name { font-family:var(--font-display); font-size:22px; font-weight:900; margin:4px 0; }
+    .rental-card-type { font-size:13px; color:#666; margin-bottom:12px; }
+    .rental-card-specs { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .rental-card-spec { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; border-bottom:1px solid #f0f0f0; }
+    .rental-card-spec span { color:#666; }
+    .rental-card-spec strong { color:#111; }
+    /* Rental Request Panel */
+    .rent-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.6); z-index:10000; justify-content:center; align-items:center; }
+    .rent-overlay.open { display:flex; }
+    .rent-panel { width:540px; max-width:95vw; max-height:90vh; background:#fff; overflow-y:auto; border-radius:16px; position:relative; animation:rent-pop .2s ease; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+    @keyframes rent-pop { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .rent-panel-top { background:var(--black); padding:0; border-radius:16px 16px 0 0; position:relative; overflow:hidden; }
+    .rent-panel-top img { width:100%; height:200px; object-fit:cover; display:block; opacity:.7; }
+    .rent-panel-top-info { position:absolute; bottom:0; left:0; right:0; padding:24px 28px 20px; background:linear-gradient(transparent 0%,rgba(0,0,0,.9) 70%); color:#fff; text-shadow:0 2px 8px rgba(0,0,0,.6); }
+    .rent-panel-top-info h2 { font-family:var(--font-display); font-size:24px; font-weight:900; margin:0; }
+    .rent-panel-top-info span { font-size:14px; color:rgba(255,255,255,.6); }
+    .rent-panel-close { position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; color:rgba(255,255,255,.6); line-height:1; }
+    .rent-panel-close:hover { color:#fff; }
+    .rent-panel-body { padding:24px 28px 32px; }
+    .rent-section { font-size:12px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.1em; margin:20px 0 10px; }
+    .rent-section:first-child { margin-top:0; }
+    .rent-row { display:flex; gap:10px; margin-bottom:10px; }
+    .rent-row input, .rent-row select { flex:1; padding:11px 14px; border:1px solid #e0e0e0; border-radius:6px; font-size:14px; font-family:inherit; background:#fafafa; transition:border .15s; }
+    .rent-row input:focus, .rent-row select:focus { border-color:var(--red); outline:none; background:#fff; }
+    .rent-row input::placeholder { color:#aaa; }
+    .rent-toggle { display:flex; align-items:center; gap:10px; margin:14px 0; cursor:pointer; }
+    .rent-toggle input[type="checkbox"] { width:18px; height:18px; accent-color:var(--red); }
+    .rent-toggle span { font-size:14px; font-weight:600; }
+    .rent-dur-grid { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 14px; }
+    .rent-dur-grid label { font-size:13px; cursor:pointer; padding:8px 14px; border:1px solid #e0e0e0; border-radius:20px; transition:all .15s; user-select:none; }
+    .rent-dur-grid label:hover { border-color:#999; }
+    .rent-dur-grid label:has(input:checked) { border-color:var(--red); background:var(--red); color:#fff; }
+    .rent-dur-grid input[type="radio"] { display:none; }
+    .rent-agree { font-size:12px; color:#888; line-height:1.5; margin:16px 0 0; padding:14px; background:#f7f7f7; border-radius:8px; display:flex; align-items:flex-start; gap:10px; }
+    .rent-agree input[type="checkbox"] { width:18px; height:18px; margin-top:1px; flex-shrink:0; accent-color:var(--red); }
+    .rent-agree label { cursor:pointer; }
+    .rent-actions { display:flex; gap:10px; margin-top:24px; }
+    .rent-actions .btn-back { flex:0 0 auto; padding:12px 20px; background:#fff; border:1px solid #ddd; border-radius:8px; font-size:14px; cursor:pointer; font-weight:600; }
+    .rent-actions .btn-back:hover { border-color:#333; }
+    .rent-actions .btn-submit { flex:1; padding:12px 20px; background:var(--red); color:#fff; border:none; border-radius:8px; font-size:15px; cursor:pointer; font-weight:700; }
+    .rent-actions .btn-submit:hover { background:#c00; }
+    .rent-success { text-align:center; padding:40px 20px; }
+    .rent-success h2 { color:#28a745; font-family:var(--font-display); }
+    @media(max-width:900px) {
+      .rental-cats { grid-template-columns:repeat(3,1fr); }
+      .rental-grid { grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); }
+    }
+    @media(max-width:600px) {
+      .rental-cats { grid-template-columns:repeat(2,1fr); gap:10px; }
+      .rental-cat-label { font-size:13px; padding:8px 10px; }
+      .rental-grid { grid-template-columns:1fr; }
+      .rent-overlay { align-items:flex-end; }
+      .rent-panel { max-width:100%; max-height:95vh; border-radius:16px 16px 0 0; width:100%; }
+      .rent-panel-top { border-radius:16px 16px 0 0; }
+      .rent-panel-top img { height:150px; }
+      .rent-panel-body { padding:20px 16px 28px; }
+      .rent-row { flex-wrap:wrap; }
+      .rent-row input, .rent-row select { min-width:0; }
+      .rent-row input[style*="max-width"] { max-width:none !important; }
+      .rent-dur-grid { gap:6px; }
+      .rent-dur-grid label { padding:7px 12px; font-size:12px; }
+      .rental-machines-header { flex-direction:column; gap:12px; align-items:flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="https://www.facebook.com/dozers.com1/" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>Facebook</a>
+  <a href="tel:+12299240035"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>(229) 924-0035</a>
+</div>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/"><img src="/images/perry-logo.png" alt="Perry Brothers Equipment Company" width="327" height="98" ></a>
+    <ul class="nav-links">
+      <li><a href="/sales/">Sales</a><div class="dropdown"><a href="/sales/small-excavators/">Small Excavators</a><a href="/sales/medium-excavators/">Medium Excavators</a><a href="/sales/large-excavators/">Large Excavators</a><a href="/sales/motor-graders/">Motor Graders</a><a href="/sales/wheel-loaders/">Wheel Loaders</a><a href="/sales/machine-rollers/">Machine Rollers</a><a href="/sales/telehandlers/">Telehandlers</a><a href="/sales/backhoes/">Backhoes</a><a href="/sales/skid-steers/">Skid Steers</a></div></li>
+      <li><a href="/deals/" class="nav-deals">Deals</a></li>
+      <li><a href="/rentals/">Rentals</a></li>
+      <li><a href="/service/">Service</a></li>
+      <li><a href="/locations/">Locations</a></li>
+      <li><a href="/media/">Media</a></li>
+      <li><a href="/contact/" class="nav-cta">Get a Quote</a></li>
+    </ul>
+    <button class="nav-hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-section">Sales</div>
+    <a href="/sales/small-excavators/">Small Excavators</a><a href="/sales/medium-excavators/">Medium Excavators</a><a href="/sales/large-excavators/">Large Excavators</a><a href="/sales/motor-graders/">Motor Graders</a><a href="/sales/wheel-loaders/">Wheel Loaders</a><a href="/sales/machine-rollers/">Machine Rollers</a><a href="/sales/telehandlers/">Telehandlers</a><a href="/sales/backhoes/">Backhoes</a><a href="/sales/skid-steers/">Skid Steers</a>
+    <div class="mobile-section">Pages</div>
+    <a href="/deals/" class="nav-deals">Deals</a>
+    <a href="/rentals/">Rentals</a><a href="/service/">Service</a><a href="/locations/">Locations</a><a href="/media/">Media</a><a href="/contact/">Get a Quote</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section style="background:var(--black);padding:64px 24px 48px;">
+  <div class="section-inner" style="text-align:center;">
+    <p class="section-eyebrow" style="color:var(--red);">Equipment Rentals</p>
+    <h1 style="font-family:var(--font-display);font-size:clamp(36px,6vw,64px);font-weight:900;color:var(--white);line-height:1.05;margin-bottom:16px;">Rent the Right Machine<br>for Your Job</h1>
+    <p style="font-size:17px;color:rgba(255,255,255,.65);max-width:560px;margin:0 auto 16px;">Daily, weekly, and monthly rentals — delivered to your site. Select a category below to see what's available.</p>
+  </div>
+</section>
+
+<!-- Category Thumbnails -->
+<section id="categories" style="background:var(--light);padding:48px 24px 48px;">
+  <div class="section-inner">
+    <div class="rental-cats">
+
+      <div class="rental-cat" onclick="showCategory('mini-excavators',this)">
+        <img src="/images/gallery/sy35-cab/01.jpg" alt="Mini Excavators" loading="lazy">
+        <div class="rental-cat-label">Mini Excavators</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('large-excavators',this)">
+        <img src="/images/1-SY500H_Still_Right-Facing_Horizontal-1.jpg" alt="Large Excavators" loading="lazy">
+        <div class="rental-cat-label">Large Excavators</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('motor-graders',this)">
+        <img src="/images/48A0342-1.webp" alt="Motor Graders" loading="lazy">
+        <div class="rental-cat-label">Motor Graders</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('skid-steers',this)">
+        <img src="/images/IMG_4355.webp" alt="Skid Steers" loading="lazy">
+        <div class="rental-cat-label">Skid Steers</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('telehandlers',this)">
+        <img src="/images/STH1256A_-10.jpg" alt="Telehandlers" loading="lazy">
+        <div class="rental-cat-label">Telehandlers</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('wheel-loaders',this)">
+        <img src="/images/SW405K_RJP5101_1080x1080.jpg" alt="Wheel Loaders" loading="lazy">
+        <div class="rental-cat-label">Wheel Loaders</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('backhoes',this)">
+        <img src="/images/SANY_SLB95_A0131_comp.jpg" alt="Backhoes" loading="lazy">
+        <div class="rental-cat-label">Backhoes</div>
+      </div>
+
+      <div class="rental-cat" onclick="showCategory('rollers',this)">
+        <img src="/images/IMG_5551.jpg" alt="Rollers" loading="lazy">
+        <div class="rental-cat-label">Rollers</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Machine Listings (hidden until category clicked) -->
+<section id="machines-section" style="background:var(--white);padding:48px 24px 64px;display:none;">
+  <div class="section-inner">
+
+    <!-- Mini Excavators -->
+    <div class="rental-machines" id="cat-mini-excavators">
+      <div class="rental-machines-header">
+        <h2>Mini Excavators</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/SY16C__Angle-2-500x500-1.jpg" alt="SANY SY16C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY16C</h3>
+            <p class="rental-card-type">Mini Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>3,648 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>12.6 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>7'11"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY16C','Mini Excavator','/images/SY16C__Angle-2-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY26U_Angle-2-500x500-1.jpg" alt="SANY SY26U" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY26U</h3>
+            <p class="rental-card-type">Compact Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>6,148 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>21 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>9'7"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY26U','Compact Excavator','/images/SY26U_Angle-2-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/gallery/sy35-cab/01.jpg" alt="SANY SY35U" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY35U</h3>
+            <p class="rental-card-type">Compact Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>8,290 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>24.8 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>11'4"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY35U','Compact Excavator','/images/gallery/sy35-cab/01.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY50U_right_side.jpg" alt="SANY SY50U" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY50U</h3>
+            <p class="rental-card-type">Compact Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>11,840 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>38.7 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>13'0"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY50U','Compact Excavator','/images/SY50U_right_side.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/gallery/sy60/01.jpg" alt="SANY SY60C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY60C</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>13,448 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>46.3 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>13'9"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY60C','Small Excavator','/images/gallery/sy60/01.jpg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Large Excavators -->
+    <div class="rental-machines" id="cat-large-excavators">
+      <div class="rental-machines-header">
+        <h2>Large Excavators</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/SY75C_Angle-1-500x500-1.jpg" alt="SANY SY75C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY75C</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>17,242 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>55.4 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>15'5"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY75C','Small Excavator','/images/SY75C_Angle-1-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY80U-500x500-1.jpg" alt="SANY SY80U" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY80U</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>18,739 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>60.4 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>15'9"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY80U','Small Excavator','/images/SY80U-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/sany-sy95c-excavator-1.jpg" alt="SANY SY95C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY95C</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>20,944 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>67 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>16'1"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY95C','Small Excavator','/images/sany-sy95c-excavator-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY135C_Angle-2-500x500-1.jpg" alt="SANY SY135C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY135C</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>30,423 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>101 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>18'8"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY135C','Small Excavator','/images/SY135C_Angle-2-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY155U__0003_SANY_Excavator_SY155U_side-view-dig_PRESS-NEW-500x500-1.jpg" alt="SANY SY155U" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY155U</h3>
+            <p class="rental-card-type">Small Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>35,274 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>115 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>19'6"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY155U','Small Excavator','/images/SY155U__0003_SANY_Excavator_SY155U_side-view-dig_PRESS-NEW-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/gallery/sy215c/01.jpg" alt="SANY SY215C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY215C</h3>
+            <p class="rental-card-type">Medium Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>51,919 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>164 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>21'8"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY215C','Medium Excavator','/images/gallery/sy215c/01.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY225C-Excavator-1-500x500-1.jpg" alt="SANY SY225C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY225C</h3>
+            <p class="rental-card-type">Medium Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>54,013 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>164 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>21'8"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY225C','Medium Excavator','/images/SY225C-Excavator-1-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY265C_-1_comp.jpg" alt="SANY SY265C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY265C</h3>
+            <p class="rental-card-type">Medium Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>60,627 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>193 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>22'8"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY265C','Medium Excavator','/images/SY265C_-1_comp.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY335C_48A3468.jpg" alt="SANY SY335C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY335C</h3>
+            <p class="rental-card-type">Medium Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>76,059 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>270 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>24'10"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY335C','Medium Excavator','/images/SY335C_48A3468.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/6-SY365C_Working-Bucket_Up_Horizontal-copy-e1722890169861.jpg" alt="SANY SY365C" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY365C</h3>
+            <p class="rental-card-type">Large Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>81,128 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>298 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>23'1"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY365C','Large Excavator','/images/6-SY365C_Working-Bucket_Up_Horizontal-copy-e1722890169861.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY500H_RJP2728.jpg" alt="SANY SY500H" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY500H</h3>
+            <p class="rental-card-type">Large Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>114,640 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>400 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>24'7"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY500H','Large Excavator','/images/SY500H_RJP2728.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SY750H-Photoshopped_comp.jpg" alt="SANY SY750H" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SY750H</h3>
+            <p class="rental-card-type">Large Excavator</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>173,063 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>524 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>24'10"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SY750H','Large Excavator','/images/SY750H-Photoshopped_comp.jpg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motor Graders -->
+    <div class="rental-machines" id="cat-motor-graders">
+      <div class="rental-machines-header">
+        <h2>Motor Graders</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/9-SMG200C8__Still_Side-View_Horizontal_comp.jpg" alt="SANY SMG200C-8" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SMG200C-8</h3>
+            <p class="rental-card-type">Motor Grader</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>45,768 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>253 HP</strong></div>
+              <div class="rental-card-spec"><span>Blade Width</span><strong>14'1"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SMG200C-8','Motor Grader','/images/9-SMG200C8__Still_Side-View_Horizontal_comp.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/IMG_2442-e1720614872843.jpeg" alt="SANY SMG200AWD" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SMG200AWD</h3>
+            <p class="rental-card-type">Motor Grader — All Wheel Drive</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>47,715 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>253 HP</strong></div>
+              <div class="rental-card-spec"><span>Blade Width</span><strong>14'1"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SMG200AWD','Motor Grader — AWD','/images/IMG_2442-e1720614872843.jpeg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skid Steers -->
+    <div class="rental-machines" id="cat-skid-steers">
+      <div class="rental-machines-header">
+        <h2>Skid Steers</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/IMG_4355.webp" alt="SANY ST230V" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">ST230V</h3>
+            <p class="rental-card-type">Skid Steer Loader</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>10,318 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>74 HP</strong></div>
+              <div class="rental-card-spec"><span>Rated Op Cap</span><strong>2,579 lb</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('ST230V','Skid Steer Loader','/images/IMG_4355.webp')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telehandlers -->
+    <div class="rental-machines" id="cat-telehandlers">
+      <div class="rental-machines-header">
+        <h2>Telehandlers</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/STH1256A_-10.jpg" alt="SANY STH1256A" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">STH1256A</h3>
+            <p class="rental-card-type">Telehandler</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Lift Capacity</span><strong>12,000 lb</strong></div>
+              <div class="rental-card-spec"><span>Max Height</span><strong>56 ft</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>121 HP</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('STH1256A','Telehandler','/images/STH1256A_-10.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/STH1056A_-28.jpg" alt="SANY STH1056A" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">STH1056A</h3>
+            <p class="rental-card-type">Telehandler</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Lift Capacity</span><strong>10,000 lb</strong></div>
+              <div class="rental-card-spec"><span>Max Height</span><strong>54 ft</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>121 HP</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('STH1056A','Telehandler','/images/STH1056A_-28.jpg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wheel Loaders -->
+    <div class="rental-machines" id="cat-wheel-loaders">
+      <div class="rental-machines-header">
+        <h2>Wheel Loaders</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/SW405K_RJP5101_1080x1080.jpg" alt="SANY SW405K" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SW405K</h3>
+            <p class="rental-card-type">Wheel Loader</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>40,786 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>228 HP</strong></div>
+              <div class="rental-card-spec"><span>Bucket Capacity</span><strong>4.0 cu yd</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SW405K','Wheel Loader','/images/SW405K_RJP5101_1080x1080.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/2-SW305K_left-angle-pavement_horizontal-cropped-e1720539874573.png" alt="SANY SW305K" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SW305K</h3>
+            <p class="rental-card-type">Wheel Loader</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>32,222 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>148 HP</strong></div>
+              <div class="rental-card-spec"><span>Bucket Capacity</span><strong>1.6 cu yd</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SW305K','Wheel Loader','/images/2-SW305K_left-angle-pavement_horizontal-cropped-e1720539874573.png')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backhoes -->
+    <div class="rental-machines" id="cat-backhoes">
+      <div class="rental-machines-header">
+        <h2>Backhoes</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/SANY_SLB95_A0131_comp.jpg" alt="SANY SLB95" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SLB95</h3>
+            <p class="rental-card-type">Backhoe Loader</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>16,623 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>95 HP</strong></div>
+              <div class="rental-card-spec"><span>Max Dig Depth</span><strong>15'5"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SLB95','Backhoe Loader','/images/SANY_SLB95_A0131_comp.jpg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rollers -->
+    <div class="rental-machines" id="cat-rollers">
+      <div class="rental-machines-header">
+        <h2>Rollers</h2>
+        <button class="rental-machines-close" onclick="hideCategory()">Back to Categories</button>
+      </div>
+      <div class="rental-grid">
+        <div class="rental-card">
+          <img src="/images/IMG_5551.jpg" alt="SANY SSR120HT" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SSR120HT</h3>
+            <p class="rental-card-type">Single Drum Roller</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>26,103 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>145 HP</strong></div>
+              <div class="rental-card-spec"><span>Drum Width</span><strong>67"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SSR120HT','Single Drum Roller','/images/IMG_5551.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SANY_Roller_SSR120C-8_front-side-view_PRESS_NEW-500x500-1.jpg" alt="SANY SSR120C-8" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SSR120C-8</h3>
+            <p class="rental-card-type">Padfoot Roller</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>25,814 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>145 HP</strong></div>
+              <div class="rental-card-spec"><span>Drum Width</span><strong>67"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SSR120C-8','Padfoot Roller','/images/SANY_Roller_SSR120C-8_front-side-view_PRESS_NEW-500x500-1.jpg')">Rent</button>
+          </div>
+        </div>
+        <div class="rental-card">
+          <img src="/images/SANY_SSR80_Roller_2-scaled-1.jpg" alt="SANY SSR80" loading="lazy">
+          <div class="rental-card-body">
+            <p class="rental-card-brand">SANY</p>
+            <h3 class="rental-card-name">SSR80</h3>
+            <p class="rental-card-type">Single Drum Roller</p>
+            <div class="rental-card-specs">
+              <div class="rental-card-spec"><span>Operating Weight</span><strong>15,752 lb</strong></div>
+              <div class="rental-card-spec"><span>Engine Power</span><strong>68 HP</strong></div>
+              <div class="rental-card-spec"><span>Drum Width</span><strong>60"</strong></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openRental('SSR80','Single Drum Roller','/images/SANY_SSR80_Roller_2-scaled-1.jpg')">Rent</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-inner">
+    <p class="section-eyebrow" style="text-align:center;">Rental Questions</p>
+    <h2 class="section-title" style="text-align:center;">Frequently Asked Questions</h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 40px;max-width:560px;">Everything you need to know about reserving equipment, rental terms, delivery, and support.</p>
+    <div class="faq-list">
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How do I reserve a rental machine?<span class="faq-icon">+</span></button><div class="faq-answer">You can request a rental directly through our website, call our team, or visit our location. Our staff will confirm availability, rental dates, pricing, and delivery options.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Do you offer equipment delivery?<span class="faq-icon">+</span></button><div class="faq-answer">Yes. We offer equipment delivery throughout Americus, Albany, and surrounding South Georgia areas. Delivery pricing depends on distance and machine size.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What rental periods are available?<span class="faq-icon">+</span></button><div class="faq-answer">We offer daily, weekly, and monthly rental options depending on the machine and your project needs. Long-term rental pricing may also be available.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Is a deposit required for rentals?<span class="faq-icon">+</span></button><div class="faq-answer">Some rentals may require a deposit depending on the machine type, rental duration, and account history. Our team will explain any requirements during the reservation process.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">What happens if the machine breaks down?<span class="faq-icon">+</span></button><div class="faq-answer">Our service department works quickly to minimize downtime. If an issue occurs during your rental, contact us immediately so we can help troubleshoot or arrange service support.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Can I extend my rental period?<span class="faq-icon">+</span></button><div class="faq-answer">In most cases, yes. Contact us before your scheduled return date and we'll work with you to extend the rental if the equipment is still available.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="demo-cta" style="background:var(--black);">
+  <div class="demo-inner">
+    <div class="demo-text">
+      <h2 style="color:var(--white);">Need Help Choosing?</h2>
+      <p style="color:rgba(255,255,255,.65);">Our team can recommend the right machine for your job. Call or send us your project details.</p>
+    </div>
+    <a href="/contact/" class="btn btn-primary">Contact Us</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand"><img src="/images/perry-logo.png" alt="Perry Brothers Equipment Company" width="327" height="98" ><p>South Georgia's trusted SANY heavy equipment dealer. Sales, rentals, service, and parts for contractors, farms, and crews across the Southeast.</p></div>
+      <div class="footer-col"><h4>Equipment</h4><a href="/sales/small-excavators/">Small Excavators</a><a href="/sales/medium-excavators/">Medium Excavators</a><a href="/sales/large-excavators/">Large Excavators</a><a href="/sales/motor-graders/">Motor Graders</a><a href="/sales/wheel-loaders/">Wheel Loaders</a><a href="/sales/machine-rollers/">Machine Rollers</a><a href="/sales/telehandlers/">Telehandlers</a><a href="/sales/backhoes/">Backhoes</a><a href="/sales/skid-steers/">Skid Steers</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about/">About</a><a href="/rentals/">Rentals</a><a href="/service/">Service</a><a href="/locations/">Locations</a><a href="/media/">Media</a><a href="/contact/">Contact</a></div>
+      <div class="footer-col"><h4>Contact</h4><a href="tel:+12299240035">(229) 924-0035</a><a href="tel:+12516517269">(251) 651-7269</a><a href="mailto:contact@perryequip.com">contact@perryequip.com</a><a href="/locations/">Americus, GA &amp; Loxley, AL</a></div>
+    </div>
+    <div class="footer-bottom"><span>&copy; 2026 Perry Brothers Equipment Company. All rights reserved.</span><span>South Georgia SANY Dealer</span></div>
+  </div>
+</footer>
+<script>
+function toggleMenu(){const nav=document.getElementById('mobileNav');nav.classList.toggle('open')}
+function toggleFaq(btn){const item=btn.closest('.faq-item');const isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!isOpen)item.classList.add('open');}
+
+var activeCategory = null;
+function showCategory(cat, el) {
+  /* Hide all machine listings */
+  document.querySelectorAll('.rental-machines').forEach(function(e) { e.classList.remove('show'); });
+  /* Remove active from all thumbnails */
+  document.querySelectorAll('.rental-cat').forEach(function(e) { e.classList.remove('active'); });
+
+  /* Show selected category */
+  var section = document.getElementById('cat-' + cat);
+  if (section) {
+    section.classList.add('show');
+    document.getElementById('machines-section').style.display = 'block';
+    /* Highlight the clicked thumbnail */
+    if (el) el.classList.add('active');
+    /* Scroll to machines with offset so title is visible */
+    var target = document.getElementById('machines-section');
+    var y = target.getBoundingClientRect().top + window.pageYOffset - 20;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    activeCategory = cat;
+  }
+}
+
+/* ── Rental Request Panel ── */
+function openRental(model, type, img) {
+  var overlay = document.getElementById('rent-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'rent-overlay';
+    overlay.className = 'rent-overlay';
+    overlay.innerHTML =
+      '<div class="rent-panel">' +
+        '<div class="rent-panel-top" id="rent-machine">' +
+          '<button class="rent-panel-close" onclick="closeRental()">&times;</button>' +
+        '</div>' +
+        '<div class="rent-panel-body">' +
+          '<p class="rent-section">Your Details</p>' +
+          '<div class="rent-row"><input type="text" id="rent-fname" placeholder="First Name *"><input type="text" id="rent-lname" placeholder="Last Name *"></div>' +
+          '<div class="rent-row"><input type="email" id="rent-email" placeholder="Email *"><input type="tel" id="rent-phone" placeholder="Phone *"></div>' +
+          '<div class="rent-row"><input type="text" id="rent-company" placeholder="Company (optional)"></div>' +
+          '<div class="rent-row"><input type="text" id="rent-address" placeholder="Address"><input type="text" id="rent-city" placeholder="City"></div>' +
+          '<div class="rent-row"><input type="text" id="rent-state" placeholder="State" style="max-width:100px"><input type="text" id="rent-zip" placeholder="Zip" style="max-width:100px"></div>' +
+          '<p class="rent-section">Rental Details</p>' +
+          '<label class="rent-toggle"><input type="checkbox" id="rent-delivery"><span>Deliver to my jobsite</span></label>' +
+          '<p style="font-size:13px;font-weight:600;margin:12px 0 6px;color:#555;">Start Date</p>' +
+          '<div class="rent-row"><input type="date" id="rent-start"></div>' +
+          '<p style="font-size:13px;font-weight:600;margin:12px 0 6px;color:#555;">How long do you need it?</p>' +
+          '<div class="rent-dur-grid">' +
+            '<label><input type="radio" name="rent-dur" value="2-4 weeks">2-4 weeks</label>' +
+            '<label><input type="radio" name="rent-dur" value="1-2 months">1-2 months</label>' +
+            '<label><input type="radio" name="rent-dur" value="2-6 months">2-6 months</label>' +
+            '<label><input type="radio" name="rent-dur" value="6-12 months">6-12 months</label>' +
+            '<label><input type="radio" name="rent-dur" value="1 year+">1 year+</label>' +
+          '</div>' +
+          '<div class="rent-agree"><input type="checkbox" id="rent-agree"><label for="rent-agree">This request does not guarantee a rental agreement. A team member will follow up to confirm availability, pricing, and next steps.</label></div>' +
+          '<p id="rent-error" style="color:var(--red);font-size:13px;margin:8px 0;display:none;"></p>' +
+          '<div id="rent-form-area" class="rent-actions"><button class="btn-back" onclick="closeRental()">Cancel</button><button class="btn-submit" onclick="submitRental()">Submit Request</button></div>' +
+          '<div id="rent-success" class="rent-success" style="display:none;"><h2>We got your request!</h2><p style="margin:12px 0;color:#555;">A team member will get back to you within 1 business day — usually within a few hours.</p><p><a href="tel:+12299240035" style="color:var(--red);font-weight:600;">(229) 924-0035</a></p><button class="btn-back" style="margin-top:20px;" onclick="closeRental()">Close</button></div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeRental(); });
+  }
+
+  /* Set machine info in header */
+  document.getElementById('rent-machine').innerHTML =
+    '<button class="rent-panel-close" onclick="closeRental()">&times;</button>' +
+    '<img src="' + img + '" alt="SANY ' + model + '">' +
+    '<div class="rent-panel-top-info"><h2>Rent SANY ' + model + '</h2><span>' + type + '</span></div>';
+  overlay.dataset.model = model;
+  overlay.dataset.type = type;
+
+  /* Reset form */
+  document.getElementById('rent-form-area').style.display = 'flex';
+  document.getElementById('rent-success').style.display = 'none';
+  document.getElementById('rent-error').style.display = 'none';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRental() {
+  var overlay = document.getElementById('rent-overlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitRental() {
+  var fname = document.getElementById('rent-fname').value.trim();
+  var lname = document.getElementById('rent-lname').value.trim();
+  var email = document.getElementById('rent-email').value.trim();
+  var phone = document.getElementById('rent-phone').value.trim();
+  var err = document.getElementById('rent-error');
+
+  if (!fname || !lname || !email || !phone) {
+    err.textContent = 'Please fill out all required contact fields.';
+    err.style.display = 'block';
+    return;
+  }
+  if (!document.getElementById('rent-agree').checked) {
+    err.textContent = 'Please accept the availability agreement.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  var overlay = document.getElementById('rent-overlay');
+  var durEl = document.querySelector('input[name="rent-dur"]:checked');
+
+  var data = new FormData();
+  data.append('first_name', fname);
+  data.append('last_name', lname);
+  data.append('email', email);
+  data.append('phone', phone);
+  data.append('machine', 'SANY ' + (overlay.dataset.model || ''));
+  data.append('interest', 'Equipment Rental');
+  data.append('source', 'rental-page');
+  data.append('message',
+    'Rental Request: SANY ' + (overlay.dataset.model || '') + ' (' + (overlay.dataset.type || '') + ')' +
+    '\nCompany: ' + (document.getElementById('rent-company').value || 'N/A') +
+    '\nAddress: ' + (document.getElementById('rent-address').value || '') + ', ' +
+      (document.getElementById('rent-city').value || '') + ' ' +
+      (document.getElementById('rent-state').value || '') + ' ' +
+      (document.getElementById('rent-zip').value || '') +
+    '\nDelivery: ' + (document.getElementById('rent-delivery').checked ? 'Yes' : 'No') +
+    '\nStart Date: ' + (document.getElementById('rent-start').value || 'Not specified') +
+    '\nDuration: ' + (durEl ? durEl.value : 'Not specified')
+  );
+
+  /* Submit via existing lead endpoint */
+  fetch('https://raspy-cell-4751.lance-74b.workers.dev', {
+    method: 'POST',
+    body: data
+  }).then(function() {
+    document.getElementById('rent-form-area').style.display = 'none';
+    document.getElementById('rent-success').style.display = 'block';
+  }).catch(function() {
+    document.getElementById('rent-form-area').style.display = 'none';
+    document.getElementById('rent-success').style.display = 'block';
+  });
+}
+
+function hideCategory() {
+  document.querySelectorAll('.rental-machines').forEach(function(el) { el.classList.remove('show'); });
+  document.querySelectorAll('.rental-cat').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('machines-section').style.display = 'none';
+  document.getElementById('categories').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  activeCategory = null;
+}
+</script>
+<script src="/js/chat.js"></script>
+<script src="/js/deals-gate.js"></script>
+</body>
+</html>
