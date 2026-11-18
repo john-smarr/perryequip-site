@@ -413,6 +413,44 @@ async function handleChatLead(request, env) {
   }
 }
 
+/* POST /api/rental — Rental request form submission */
+async function handleRental(request, env) {
+  try {
+    var body = await request.json();
+
+    var emailBody = "New Rental Request from perryequip.com\n\n" +
+      "Machine: " + (body.machine || "Not specified") + "\n" +
+      "Name: " + (body.first_name || "") + " " + (body.last_name || "") + "\n" +
+      "Email: " + (body.email || "") + "\n" +
+      "Phone: " + (body.phone || "") + "\n" +
+      "Company: " + (body.company || "N/A") + "\n" +
+      "Address: " + (body.address || "") + ", " + (body.city || "") + " " + (body.state || "") + " " + (body.zip || "") + "\n" +
+      "Delivery: " + (body.delivery ? "Yes" : "No") + "\n" +
+      "Start Date: " + (body.start_date || "Not specified") + "\n" +
+      "Duration: " + (body.duration || "Not specified") + "\n";
+
+    await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + env.SENDGRID_API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
+        from: { email: "noreply@perryequip.com", name: "Perry Brothers Rentals" },
+        reply_to: { email: body.email || "noreply@perryequip.com", name: (body.first_name || "") + " " + (body.last_name || "") },
+        subject: "Rental Request: " + (body.machine || "Equipment"),
+        content: [{ type: "text/plain", value: emailBody }]
+      })
+    });
+
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    console.log("Rental error: " + err.message);
+    return jsonResponse({ error: "Failed to submit" }, 500);
+  }
+}
+
 /* POST /api/chat/close — Visitor closes chat (send transcript) */
 async function handleChatClose(request, env) {
   try {
@@ -722,6 +760,9 @@ export default {
     }
     if (path === "/api/chat/lead" && method === "POST") {
       return handleChatLead(request, env);
+    }
+    if (path === "/api/rental" && method === "POST") {
+      return handleRental(request, env);
     }
     if (path === "/api/chat/close" && method === "POST") {
       return handleChatClose(request, env);

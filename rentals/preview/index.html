@@ -835,36 +835,39 @@ function submitRental() {
   var overlay = document.getElementById('rent-overlay');
   var durEl = document.querySelector('input[name="rent-dur"]:checked');
 
-  var data = new FormData();
-  data.append('first_name', fname);
-  data.append('last_name', lname);
-  data.append('email', email);
-  data.append('phone', phone);
-  data.append('machine', 'SANY ' + (overlay.dataset.model || ''));
-  data.append('interest', 'Equipment Rental');
-  data.append('source', 'rental-page');
-  data.append('message',
-    'Rental Request: SANY ' + (overlay.dataset.model || '') + ' (' + (overlay.dataset.type || '') + ')' +
-    '\nCompany: ' + (document.getElementById('rent-company').value || 'N/A') +
-    '\nAddress: ' + (document.getElementById('rent-address').value || '') + ', ' +
-      (document.getElementById('rent-city').value || '') + ' ' +
-      (document.getElementById('rent-state').value || '') + ' ' +
-      (document.getElementById('rent-zip').value || '') +
-    '\nDelivery: ' + (document.getElementById('rent-delivery').checked ? 'Yes' : 'No') +
-    '\nStart Date: ' + (document.getElementById('rent-start').value || 'Not specified') +
-    '\nDuration: ' + (durEl ? durEl.value : 'Not specified')
-  );
+  var data = {
+    first_name: fname,
+    last_name: lname,
+    email: email,
+    phone: phone,
+    machine: 'SANY ' + (overlay.dataset.model || ''),
+    company: document.getElementById('rent-company').value || '',
+    address: document.getElementById('rent-address').value || '',
+    city: document.getElementById('rent-city').value || '',
+    state: document.getElementById('rent-state').value || '',
+    zip: document.getElementById('rent-zip').value || '',
+    delivery: document.getElementById('rent-delivery').checked,
+    start_date: document.getElementById('rent-start').value || '',
+    duration: durEl ? durEl.value : ''
+  };
 
-  /* Submit via existing lead endpoint */
-  fetch('https://raspy-cell-4751.lance-74b.workers.dev', {
+  fetch('https://raspy-cell-4751.lance-74b.workers.dev/api/rental', {
     method: 'POST',
-    body: data
-  }).then(function() {
-    document.getElementById('rent-form-area').style.display = 'none';
-    document.getElementById('rent-success').style.display = 'block';
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function(res) {
+    return res.json();
+  }).then(function(result) {
+    if (result.ok) {
+      document.getElementById('rent-form-area').style.display = 'none';
+      document.getElementById('rent-success').style.display = 'block';
+    } else {
+      document.getElementById('rent-error').textContent = 'Something went wrong. Please call us at (229) 924-0035.';
+      document.getElementById('rent-error').style.display = 'block';
+    }
   }).catch(function() {
-    document.getElementById('rent-form-area').style.display = 'none';
-    document.getElementById('rent-success').style.display = 'block';
+    document.getElementById('rent-error').textContent = 'Something went wrong. Please call us at (229) 924-0035.';
+    document.getElementById('rent-error').style.display = 'block';
   });
 }
 
