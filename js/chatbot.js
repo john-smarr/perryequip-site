@@ -222,6 +222,30 @@
     }
   }
 
+  /* ── Dedup: add server messages to conversation + display, skipping duplicates ── */
+  function addServerMessages(msgs) {
+    var added = false;
+    for (var i = 0; i < msgs.length; i++) {
+      var m = msgs[i];
+      if (m.role === "visitor") { lastPollTs = Math.max(lastPollTs, m.ts); continue; }
+      var isDupe = false;
+      for (var j = 0; j < conversation.length; j++) {
+        if (conversation[j].ts === m.ts && conversation[j].role === m.role) {
+          isDupe = true;
+          break;
+        }
+      }
+      if (!isDupe) {
+        if (!added) { removeTyping(); added = true; }
+        conversation.push(m);
+        addMessage(m.content, "bot");
+      }
+      lastPollTs = Math.max(lastPollTs, m.ts);
+    }
+    if (added) saveSession();
+    return added;
+  }
+
   /* ── Message display ── */
   function formatMessage(text) {
     /* Simple markdown: **bold**, *italic*, newlines */
@@ -359,15 +383,7 @@
           input.disabled = false;
         }
 
-        if (data.messages) {
-          for (var i = 0; i < data.messages.length; i++) {
-            var m = data.messages[i];
-            conversation.push(m);
-            addMessage(m.content, "bot");
-            lastPollTs = Math.max(lastPollTs, m.ts);
-          }
-        }
-
+        if (data.messages) addServerMessages(data.messages);
         saveSession();
         input.focus();
       })
@@ -399,14 +415,7 @@
 
         chatMode = data.status || "ai";
 
-        if (data.messages) {
-          for (var i = 0; i < data.messages.length; i++) {
-            var m = data.messages[i];
-            conversation.push(m);
-            addMessage(m.content, "bot");
-            lastPollTs = Math.max(lastPollTs, m.ts);
-          }
-        }
+        if (data.messages) addServerMessages(data.messages);
 
         if (data.leadCapture && !leadMode) {
           setTimeout(function () {
@@ -453,29 +462,9 @@
           saveSession();
         }
 
-        /* New messages — only display non-visitor messages (visitor messages already shown locally) */
+        /* New messages — deduped via shared helper */
         if (data.messages && data.messages.length > 0) {
-          var hasNew = false;
-          for (var i = 0; i < data.messages.length; i++) {
-            var m = data.messages[i];
-            if (m.role !== "visitor") {
-              /* Avoid duplicates by timestamp */
-              var isDupe = false;
-              for (var j = 0; j < conversation.length; j++) {
-                if (conversation[j].ts === m.ts && conversation[j].role === m.role) {
-                  isDupe = true;
-                  break;
-                }
-              }
-              if (!isDupe) {
-                if (!hasNew) { removeTyping(); hasNew = true; }
-                conversation.push(m);
-                addMessage(m.content, "bot");
-              }
-            }
-            lastPollTs = Math.max(lastPollTs, m.ts);
-          }
-          saveSession();
+          addServerMessages(data.messages);
         }
 
         /* Stop polling if chat is closed */
