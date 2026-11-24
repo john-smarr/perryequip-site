@@ -289,10 +289,25 @@ function toggleFaq(btn){
   document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
 }
-const machine=new URLSearchParams(window.location.search).get('machine');
+var params = new URLSearchParams(window.location.search);
+var machine = params.get('machine');
 if(machine)document.querySelector('input[name="machine"]').value=machine;
 
-document.querySelector('form').addEventListener('submit', function(e) {
+if (params.get('sent') === '1') {
+  var form = document.querySelector('.contact-form-wrap');
+  form.innerHTML =
+    '<div style="text-align:center;padding:60px 24px;">' +
+      '<div style="width:64px;height:64px;margin:0 auto 20px;border-radius:50%;background:#28a745;display:flex;align-items:center;justify-content:center;">' +
+        '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '</div>' +
+      '<h2 style="font-family:var(--font-display);font-size:32px;font-weight:900;margin:0 0 12px;">Message Sent!</h2>' +
+      '<p style="font-size:16px;color:#555;max-width:400px;margin:0 auto 24px;line-height:1.6;">A team member will reach out within 1 business day — usually within a few hours.</p>' +
+      '<p style="margin:0 0 24px;"><a href="tel:+12299240035" style="color:var(--red);font-weight:700;font-size:18px;text-decoration:none;">(229) 924-0035</a></p>' +
+      '<div style="display:flex;justify-content:center;"><a href="/contact/" class="btn btn-primary">Send Another Message</a></div>' +
+    '</div>';
+}
+
+document.querySelector('form')?.addEventListener('submit', function(e) {
   e.preventDefault();
   var form = this;
   grecaptcha.ready(function() {
