@@ -1004,15 +1004,10 @@ function openDemo(model, fullName, img) {
           '<button class="demo-panel-close" onclick="closeDemo()">&times;</button>' +
         '</div>' +
         '<div class="demo-panel-body">' +
-          '<p class="demo-section">Your Contact Info</p>' +
           '<div class="demo-row"><input type="text" id="demo-fname" placeholder="First Name *"><input type="text" id="demo-lname" placeholder="Last Name *"></div>' +
-          '<div class="demo-row"><input type="email" id="demo-email" placeholder="Email *"><input type="tel" id="demo-phone" placeholder="Phone *"></div>' +
-          '<div class="demo-row"><input type="text" id="demo-company" placeholder="Company (optional)"></div>' +
-          '<div class="demo-row"><input type="text" id="demo-city" placeholder="City"><input type="text" id="demo-state" placeholder="State" style="max-width:120px"></div>' +
-          '<p class="demo-section">Demo Details</p>' +
-          '<p style="font-size:13px;font-weight:600;margin:0 0 6px;color:#555;">Preferred Demo Date</p>' +
+          '<div class="demo-row"><input type="tel" id="demo-phone" placeholder="Phone *"><input type="text" id="demo-zip" placeholder="Zip Code *" style="max-width:120px"></div>' +
+          '<p style="font-size:13px;font-weight:600;margin:14px 0 6px;color:#555;">Preferred Demo Date</p>' +
           '<div class="demo-row"><input type="date" id="demo-date"></div>' +
-          '<div class="demo-row"><textarea id="demo-notes" placeholder="Anything else we should know? (optional)" rows="2"></textarea></div>' +
           '<p id="demo-error" style="color:var(--red);font-size:13px;margin:8px 0;display:none;"></p>' +
           '<div id="demo-form-area" class="demo-actions"><button class="btn-back" onclick="closeDemo()">Cancel</button><button class="btn-submit" onclick="submitDemo()">Schedule My FREE Demo</button></div>' +
           '<div id="demo-success" class="demo-success" style="display:none;"><h2>Demo Requested!</h2><p style="margin:12px 0;color:#555;">A team member will reach out within 1 business day to confirm your demo — usually within a few hours.</p><p><a href="tel:+12299240035" style="color:var(--red);font-weight:600;">(229) 924-0035</a></p><button class="btn-back" style="margin-top:20px;" onclick="closeDemo()">Close</button></div>' +
@@ -1044,12 +1039,12 @@ function closeDemo() {
 function submitDemo() {
   var fname = document.getElementById('demo-fname').value.trim();
   var lname = document.getElementById('demo-lname').value.trim();
-  var email = document.getElementById('demo-email').value.trim();
   var phone = document.getElementById('demo-phone').value.trim();
+  var zip = document.getElementById('demo-zip').value.trim();
   var err = document.getElementById('demo-error');
 
-  if (!fname || !lname || !email || !phone) {
-    err.textContent = 'Please fill out all required contact fields.';
+  if (!fname || !lname || !phone || !zip) {
+    err.textContent = 'Please fill out all required fields.';
     err.style.display = 'block';
     return;
   }
@@ -1059,14 +1054,10 @@ function submitDemo() {
   var data = {
     first_name: fname,
     last_name: lname,
-    email: email,
     phone: phone,
+    zip: zip,
     machine: overlay.dataset.machine || '',
-    company: document.getElementById('demo-company').value || '',
-    city: document.getElementById('demo-city').value || '',
-    state: document.getElementById('demo-state').value || '',
-    preferred_date: document.getElementById('demo-date').value || '',
-    notes: document.getElementById('demo-notes').value || ''
+    preferred_date: document.getElementById('demo-date').value || ''
   };
 
   fetch('https://raspy-cell-4751.lance-74b.workers.dev/api/demo', {

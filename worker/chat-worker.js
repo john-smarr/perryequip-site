@@ -488,7 +488,6 @@ async function handleDemo(request, env) {
   try {
     var body = await request.json();
     var fullName = (body.first_name || "") + " " + (body.last_name || "");
-    var location = [body.city, body.state].filter(Boolean).join(", ");
 
     var rows = "";
     function addRow(label, value) {
@@ -497,18 +496,8 @@ async function handleDemo(request, env) {
     }
     addRow("Name", fullName);
     addRow("Phone", '<a href="tel:' + (body.phone || "") + '" style="color:#d91f11;text-decoration:none;font-weight:600;">' + (body.phone || "") + '</a>');
-    addRow("Email", body.email ? '<a href="mailto:' + body.email + '" style="color:#d91f11;text-decoration:none;">' + body.email + '</a>' : "");
-    addRow("Company", body.company);
-    addRow("Location", location);
+    addRow("Zip Code", body.zip);
     addRow("Preferred Date", body.preferred_date);
-
-    var notesBlock = "";
-    if (body.notes) {
-      notesBlock = '<div style="margin:24px 28px 28px;padding:16px 20px;background:#f8f8f8;border-left:3px solid #d91f11;border-radius:0 8px 8px 0;">' +
-        '<p style="margin:0 0 4px;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Notes</p>' +
-        '<p style="margin:0;font-size:15px;color:#333;line-height:1.6;white-space:pre-wrap;">' + body.notes + '</p>' +
-        '</div>';
-    }
 
     var htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' +
       '<div style="max-width:560px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">' +
@@ -518,7 +507,6 @@ async function handleDemo(request, env) {
           '<p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.5);">' + (body.machine || "Equipment") + '</p>' +
         '</div>' +
         '<table style="width:100%;border-collapse:collapse;margin:8px 0;" cellpadding="0" cellspacing="0">' + rows + '</table>' +
-        notesBlock +
         '<div style="padding:16px 28px;border-top:1px solid #eee;text-align:center;">' +
           '<p style="margin:0;font-size:11px;color:#bbb;">Sent from perryequip.com deals page</p>' +
         '</div>' +
@@ -527,12 +515,9 @@ async function handleDemo(request, env) {
     var plainBody = "New Demo Request from perryequip.com\n\n" +
       "Machine: " + (body.machine || "Not specified") + "\n" +
       "Name: " + fullName + "\n" +
-      "Email: " + (body.email || "") + "\n" +
       "Phone: " + (body.phone || "") + "\n" +
-      "Company: " + (body.company || "N/A") + "\n" +
-      "Location: " + location + "\n" +
-      "Preferred Date: " + (body.preferred_date || "Not specified") + "\n" +
-      "Notes: " + (body.notes || "None") + "\n";
+      "Zip Code: " + (body.zip || "") + "\n" +
+      "Preferred Date: " + (body.preferred_date || "Not specified") + "\n";
 
     await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
@@ -543,7 +528,6 @@ async function handleDemo(request, env) {
       body: JSON.stringify({
         personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
         from: { email: "noreply@perryequip.com", name: "Perry Brothers Demos" },
-        reply_to: body.email ? { email: body.email, name: fullName } : undefined,
         subject: "Demo Request: " + (body.machine || "Equipment"),
         content: [
           { type: "text/plain", value: plainBody },
