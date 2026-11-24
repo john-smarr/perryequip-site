@@ -466,15 +466,11 @@ gtag('config', 'G-DGVY5FCB2R');
     .demo-overlay.open { display:flex; }
     .demo-panel { width:540px; max-width:95vw; max-height:90vh; background:#fff; overflow-y:auto; border-radius:16px; position:relative; animation:demo-pop .2s ease; box-shadow:0 20px 60px rgba(0,0,0,.3); }
     @keyframes demo-pop { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
-    .demo-panel-top { background:linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%); padding:36px 28px 28px; border-radius:16px 16px 0 0; position:relative; overflow:hidden; }
-    .demo-panel-top::before { content:''; position:absolute; top:-40%; right:-20%; width:300px; height:300px; background:radial-gradient(circle, rgba(244,196,0,.12) 0%, transparent 70%); pointer-events:none; }
-    .demo-panel-top::after { content:''; position:absolute; bottom:0; left:28px; right:28px; height:3px; background:linear-gradient(90deg, #f4c400, #d91f11); border-radius:3px 3px 0 0; }
-    .demo-panel-kicker { display:inline-block; padding:5px 10px; border-radius:999px; background:rgba(244,196,0,.15); color:#f4c400; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; }
-    .demo-panel-title { font-family:var(--font-display); font-size:28px; font-weight:900; color:#fff; margin:0 0 4px; line-height:1.1; }
-    .demo-panel-title b { color:#f4c400; }
-    .demo-panel-machine { font-size:15px; color:rgba(255,255,255,.55); margin:0; }
-    .demo-panel-close { position:absolute; top:16px; right:16px; background:rgba(255,255,255,.08); border:none; width:32px; height:32px; border-radius:50%; font-size:20px; cursor:pointer; color:rgba(255,255,255,.5); line-height:1; z-index:2; display:flex; align-items:center; justify-content:center; transition:background .15s, color .15s; }
-    .demo-panel-close:hover { background:rgba(255,255,255,.15); color:#fff; }
+    .demo-panel-top { background:var(--black); padding:28px 28px 24px; border-radius:16px 16px 0 0; position:relative; }
+    .demo-panel-top h2 { font-family:var(--font-display); font-size:24px; font-weight:900; color:#fff; margin:0 0 4px; }
+    .demo-panel-top span { font-size:14px; color:rgba(255,255,255,.55); }
+    .demo-panel-close { position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; color:rgba(255,255,255,.5); line-height:1; z-index:2; }
+    .demo-panel-close:hover { color:#fff; }
     .demo-panel-body { padding:24px 28px 32px; }
     .demo-section { font-size:12px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.1em; margin:20px 0 10px; }
     .demo-section:first-child { margin-top:0; }
@@ -523,8 +519,7 @@ gtag('config', 'G-DGVY5FCB2R');
       .deals-hero-inner h1 { font-size: 42px; }
       .demo-overlay { align-items:flex-end; }
       .demo-panel { max-width:100%; max-height:95vh; border-radius:16px 16px 0 0; width:100%; }
-      .demo-panel-top { border-radius:16px 16px 0 0; padding:28px 20px 24px; }
-      .demo-panel-title { font-size:24px; }
+      .demo-panel-top { border-radius:16px 16px 0 0; padding:24px 20px 20px; }
       .demo-panel-body { padding:20px 16px 28px; }
       .demo-row { flex-wrap:wrap; }
       .demo-row input, .demo-row textarea { min-width:0; }
@@ -1029,9 +1024,8 @@ function openDemo(model, fullName, img) {
 
   document.getElementById('demo-machine').innerHTML =
     '<button class="demo-panel-close" onclick="closeDemo()">&times;</button>' +
-    '<span class="demo-panel-kicker">Free · No Obligation</span>' +
-    '<h2 class="demo-panel-title">Schedule a <b>FREE Demo</b></h2>' +
-    '<p class="demo-panel-machine">' + fullName + '</p>';
+    '<h2>Schedule a FREE Demo</h2>' +
+    '<span>' + fullName + '</span>';
   overlay.dataset.machine = 'SANY ' + model;
 
   document.getElementById('demo-form-area').style.display = 'flex';

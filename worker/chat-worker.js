@@ -417,14 +417,43 @@ async function handleChatLead(request, env) {
 async function handleRental(request, env) {
   try {
     var body = await request.json();
+    var fullName = (body.first_name || "") + " " + (body.last_name || "");
+    var address = [body.address, body.city, body.state, body.zip].filter(Boolean).join(", ");
 
-    var emailBody = "New Rental Request from perryequip.com\n\n" +
+    var rows = "";
+    function addRow(label, value) {
+      if (!value) return;
+      rows += '<tr><td style="padding:10px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:140px;vertical-align:top;">' + label + '</td><td style="padding:10px 16px;font-size:15px;color:#111;">' + value + '</td></tr>';
+    }
+    addRow("Name", fullName);
+    addRow("Phone", '<a href="tel:' + (body.phone || "") + '" style="color:#d91f11;text-decoration:none;font-weight:600;">' + (body.phone || "") + '</a>');
+    addRow("Email", body.email ? '<a href="mailto:' + body.email + '" style="color:#d91f11;text-decoration:none;">' + body.email + '</a>' : "");
+    addRow("Company", body.company);
+    addRow("Address", address);
+    addRow("Delivery", body.delivery ? '<span style="display:inline-block;padding:3px 12px;border-radius:999px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;">Yes — to jobsite</span>' : "No");
+    addRow("Start Date", body.start_date);
+    addRow("Duration", body.duration);
+
+    var htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' +
+      '<div style="max-width:560px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">' +
+        '<div style="background:#111;padding:28px 28px 24px;">' +
+          '<p style="margin:0 0 4px;font-size:11px;color:#d91f11;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">Rental Request</p>' +
+          '<h1 style="margin:0;font-size:22px;color:#fff;font-weight:800;">' + fullName + '</h1>' +
+          '<p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.5);">' + (body.machine || "Equipment") + '</p>' +
+        '</div>' +
+        '<table style="width:100%;border-collapse:collapse;margin:8px 0;" cellpadding="0" cellspacing="0">' + rows + '</table>' +
+        '<div style="padding:16px 28px;border-top:1px solid #eee;text-align:center;">' +
+          '<p style="margin:0;font-size:11px;color:#bbb;">Sent from perryequip.com rental form</p>' +
+        '</div>' +
+      '</div></body></html>';
+
+    var plainBody = "New Rental Request from perryequip.com\n\n" +
       "Machine: " + (body.machine || "Not specified") + "\n" +
-      "Name: " + (body.first_name || "") + " " + (body.last_name || "") + "\n" +
+      "Name: " + fullName + "\n" +
       "Email: " + (body.email || "") + "\n" +
       "Phone: " + (body.phone || "") + "\n" +
       "Company: " + (body.company || "N/A") + "\n" +
-      "Address: " + (body.address || "") + ", " + (body.city || "") + " " + (body.state || "") + " " + (body.zip || "") + "\n" +
+      "Address: " + address + "\n" +
       "Delivery: " + (body.delivery ? "Yes" : "No") + "\n" +
       "Start Date: " + (body.start_date || "Not specified") + "\n" +
       "Duration: " + (body.duration || "Not specified") + "\n";
@@ -438,9 +467,12 @@ async function handleRental(request, env) {
       body: JSON.stringify({
         personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
         from: { email: "noreply@perryequip.com", name: "Perry Brothers Rentals" },
-        reply_to: { email: body.email || "noreply@perryequip.com", name: (body.first_name || "") + " " + (body.last_name || "") },
+        reply_to: body.email ? { email: body.email, name: fullName } : undefined,
         subject: "Rental Request: " + (body.machine || "Equipment"),
-        content: [{ type: "text/plain", value: emailBody }]
+        content: [
+          { type: "text/plain", value: plainBody },
+          { type: "text/html", value: htmlBody }
+        ]
       })
     });
 
@@ -455,14 +487,50 @@ async function handleRental(request, env) {
 async function handleDemo(request, env) {
   try {
     var body = await request.json();
+    var fullName = (body.first_name || "") + " " + (body.last_name || "");
+    var location = [body.city, body.state].filter(Boolean).join(", ");
 
-    var emailBody = "New Demo Request from perryequip.com\n\n" +
+    var rows = "";
+    function addRow(label, value) {
+      if (!value) return;
+      rows += '<tr><td style="padding:10px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:140px;vertical-align:top;">' + label + '</td><td style="padding:10px 16px;font-size:15px;color:#111;">' + value + '</td></tr>';
+    }
+    addRow("Name", fullName);
+    addRow("Phone", '<a href="tel:' + (body.phone || "") + '" style="color:#d91f11;text-decoration:none;font-weight:600;">' + (body.phone || "") + '</a>');
+    addRow("Email", body.email ? '<a href="mailto:' + body.email + '" style="color:#d91f11;text-decoration:none;">' + body.email + '</a>' : "");
+    addRow("Company", body.company);
+    addRow("Location", location);
+    addRow("Preferred Date", body.preferred_date);
+
+    var notesBlock = "";
+    if (body.notes) {
+      notesBlock = '<div style="margin:24px 28px 28px;padding:16px 20px;background:#f8f8f8;border-left:3px solid #d91f11;border-radius:0 8px 8px 0;">' +
+        '<p style="margin:0 0 4px;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Notes</p>' +
+        '<p style="margin:0;font-size:15px;color:#333;line-height:1.6;white-space:pre-wrap;">' + body.notes + '</p>' +
+        '</div>';
+    }
+
+    var htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' +
+      '<div style="max-width:560px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">' +
+        '<div style="background:#111;padding:28px 28px 24px;">' +
+          '<p style="margin:0 0 4px;font-size:11px;color:#d91f11;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">Demo Request</p>' +
+          '<h1 style="margin:0;font-size:22px;color:#fff;font-weight:800;">' + fullName + '</h1>' +
+          '<p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.5);">' + (body.machine || "Equipment") + '</p>' +
+        '</div>' +
+        '<table style="width:100%;border-collapse:collapse;margin:8px 0;" cellpadding="0" cellspacing="0">' + rows + '</table>' +
+        notesBlock +
+        '<div style="padding:16px 28px;border-top:1px solid #eee;text-align:center;">' +
+          '<p style="margin:0;font-size:11px;color:#bbb;">Sent from perryequip.com deals page</p>' +
+        '</div>' +
+      '</div></body></html>';
+
+    var plainBody = "New Demo Request from perryequip.com\n\n" +
       "Machine: " + (body.machine || "Not specified") + "\n" +
-      "Name: " + (body.first_name || "") + " " + (body.last_name || "") + "\n" +
+      "Name: " + fullName + "\n" +
       "Email: " + (body.email || "") + "\n" +
       "Phone: " + (body.phone || "") + "\n" +
       "Company: " + (body.company || "N/A") + "\n" +
-      "City/State: " + (body.city || "") + " " + (body.state || "") + "\n" +
+      "Location: " + location + "\n" +
       "Preferred Date: " + (body.preferred_date || "Not specified") + "\n" +
       "Notes: " + (body.notes || "None") + "\n";
 
@@ -475,9 +543,12 @@ async function handleDemo(request, env) {
       body: JSON.stringify({
         personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
         from: { email: "noreply@perryequip.com", name: "Perry Brothers Demos" },
-        reply_to: { email: body.email || "noreply@perryequip.com", name: (body.first_name || "") + " " + (body.last_name || "") },
+        reply_to: body.email ? { email: body.email, name: fullName } : undefined,
         subject: "Demo Request: " + (body.machine || "Equipment"),
-        content: [{ type: "text/plain", value: emailBody }]
+        content: [
+          { type: "text/plain", value: plainBody },
+          { type: "text/html", value: htmlBody }
+        ]
       })
     });
 
@@ -721,6 +792,8 @@ async function handleLeadForm(request, env) {
     first_name: formData.get('first_name') || '',
     last_name: formData.get('last_name') || '',
     phone: formData.get('phone') || '',
+    zip: formData.get('zip') || '',
+    contact_pref: formData.get('contact_pref') || '',
     email: formData.get('email') || '',
     interest: formData.get('interest') || '',
     machine: formData.get('machine') || '',
@@ -728,20 +801,70 @@ async function handleLeadForm(request, env) {
   };
 
   var isChat = (source === 'chatbot' || source === 'ai-chatbot');
-
-  var body = 'New ' + (isChat ? 'chatbot' : 'form') + ' submission from perryequip.com\n\n' +
-    'Name: ' + fields.first_name + ' ' + fields.last_name + '\n' +
-    'Phone: ' + fields.phone + '\n' +
-    'Email: ' + fields.email + '\n' +
-    'Interest: ' + fields.interest + '\n' +
-    'Machine: ' + fields.machine + '\n\n' +
-    'Message:\n' + fields.message;
+  var fullName = fields.first_name + ' ' + fields.last_name;
 
   var recipients = isChat
     ? [{ email: 'johnsmarr@perrybrothersoil.com' }]
     : [{ email: 'brandensmith@perryequip.com' }, { email: 'stephen@perryequip.com' }, { email: 'abbibutler@perrybrothersoil.com' }];
 
   var subject = 'New ' + (isChat ? 'chatbot ' : '') + 'inquiry: ' + (fields.machine || fields.interest || 'Contact Form');
+
+  var prefBadgeColor = fields.contact_pref === 'Call' ? '#2563eb' : '#16a34a';
+  var prefLabel = fields.contact_pref || 'Not specified';
+
+  /* Build detail rows — only include fields that have values */
+  var rows = '';
+  function addRow(label, value) {
+    if (!value) return;
+    rows += '<tr><td style="padding:10px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:140px;vertical-align:top;">' + label + '</td><td style="padding:10px 16px;font-size:15px;color:#111;">' + value + '</td></tr>';
+  }
+  addRow('Name', fullName);
+  addRow('Phone', '<a href="tel:' + fields.phone + '" style="color:#d91f11;text-decoration:none;font-weight:600;">' + fields.phone + '</a>');
+  addRow('Zip Code', fields.zip);
+  if (fields.contact_pref) {
+    addRow('Prefers', '<span style="display:inline-block;padding:3px 12px;border-radius:999px;background:' + prefBadgeColor + ';color:#fff;font-size:12px;font-weight:700;">' + prefLabel + '</span>');
+  }
+  if (fields.email) addRow('Email', '<a href="mailto:' + fields.email + '" style="color:#d91f11;text-decoration:none;">' + fields.email + '</a>');
+  addRow('Interest', fields.interest);
+  addRow('Machine', fields.machine);
+
+  var messageBlock = '';
+  if (fields.message) {
+    messageBlock = '<div style="margin:24px 28px 28px;padding:16px 20px;background:#f8f8f8;border-left:3px solid #d91f11;border-radius:0 8px 8px 0;">' +
+      '<p style="margin:0 0 4px;font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Message</p>' +
+      '<p style="margin:0;font-size:15px;color:#333;line-height:1.6;white-space:pre-wrap;">' + fields.message + '</p>' +
+      '</div>';
+  }
+
+  var htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' +
+    '<div style="max-width:560px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">' +
+      /* Header */
+      '<div style="background:#111;padding:28px 28px 24px;">' +
+        '<p style="margin:0 0 4px;font-size:11px;color:#d91f11;font-weight:800;text-transform:uppercase;letter-spacing:.1em;">' + (isChat ? 'Chatbot Lead' : 'Website Inquiry') + '</p>' +
+        '<h1 style="margin:0;font-size:22px;color:#fff;font-weight:800;">' + fullName + '</h1>' +
+        (fields.machine ? '<p style="margin:6px 0 0;font-size:14px;color:rgba(255,255,255,.5);">' + fields.machine + '</p>' : '') +
+      '</div>' +
+      /* Details table */
+      '<table style="width:100%;border-collapse:collapse;margin:8px 0;" cellpadding="0" cellspacing="0">' + rows + '</table>' +
+      /* Message */
+      messageBlock +
+      /* Footer */
+      '<div style="padding:16px 28px;border-top:1px solid #eee;text-align:center;">' +
+        '<p style="margin:0;font-size:11px;color:#bbb;">Sent from perryequip.com contact form</p>' +
+      '</div>' +
+    '</div>' +
+    '</body></html>';
+
+  /* Plain text fallback */
+  var plainBody = 'New ' + (isChat ? 'chatbot' : 'form') + ' submission from perryequip.com\n\n' +
+    'Name: ' + fullName + '\n' +
+    'Phone: ' + fields.phone + '\n' +
+    'Zip: ' + fields.zip + '\n' +
+    'Prefers: ' + (fields.contact_pref || 'N/A') + '\n' +
+    (fields.email ? 'Email: ' + fields.email + '\n' : '') +
+    'Interest: ' + fields.interest + '\n' +
+    'Machine: ' + fields.machine + '\n\n' +
+    'Message:\n' + fields.message;
 
   var sgResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
@@ -752,9 +875,12 @@ async function handleLeadForm(request, env) {
     body: JSON.stringify({
       personalizations: [{ to: recipients }],
       from: { email: 'noreply@perryequip.com', name: 'Perry Brothers Website' },
-      reply_to: { email: fields.email, name: fields.first_name + ' ' + fields.last_name },
+      reply_to: fields.email ? { email: fields.email, name: fullName } : undefined,
       subject: subject,
-      content: [{ type: 'text/plain', value: body }]
+      content: [
+        { type: 'text/plain', value: plainBody },
+        { type: 'text/html', value: htmlBody }
+      ]
     })
   });
 
