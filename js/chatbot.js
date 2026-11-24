@@ -170,11 +170,10 @@
         '</div>' +
       '</div>' +
       '<div class="pbe-chat-launcher">' +
-        '<img class="pbe-chat-avatar" src="/images/chat-avatar.png" alt="Chat with us">' +
         '<button class="pbe-chat-bubble" aria-label="Chat with us">' +
-          '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' +
-          '<span class="pbe-chat-badge"></span>' +
+          '<img src="/images/chat-avatar.png" alt="Chat with us">' +
         '</button>' +
+        '<span class="pbe-chat-badge"></span>' +
       '</div>';
     document.body.appendChild(widget);
 
