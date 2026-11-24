@@ -76,4 +76,44 @@
     e.preventDefault();
     openModal();
   });
+
+  /* ---- block direct navigation to /deals/ ---- */
+  if (/^\/deals\/?$/i.test(window.location.pathname) && !isVerified()) {
+    /* Hide page content until verified */
+    document.body.style.visibility = "hidden";
+    document.addEventListener("DOMContentLoaded", function () {
+      document.body.style.visibility = "hidden";
+      openModal();
+      var m = document.getElementById("deals-gate");
+      if (m) m.style.visibility = "visible";
+    });
+
+    /* Override close to redirect away instead of showing the page */
+    var origClose = closeModal;
+    closeModal = function () {
+      if (!isVerified()) {
+        window.location.href = "/";
+      } else {
+        document.body.style.visibility = "visible";
+        origClose();
+      }
+    };
+
+    /* Override submit to reveal page on success */
+    var origSubmit = submit;
+    submit = function () {
+      var zip = document.getElementById("dg-zip").value;
+      var result = checkZip(zip);
+      var err = document.getElementById("dg-err");
+      if (result === null) { err.textContent = "Please enter a valid 5-digit zip code."; return; }
+      if (result) {
+        sessionStorage.setItem(STORAGE_KEY, "1");
+        document.body.style.visibility = "visible";
+        var m = document.getElementById("deals-gate");
+        if (m) m.classList.remove("dg-open");
+      } else {
+        err.innerHTML = "Sorry, deals are not available in your area.<br>Give us a call — we may still be able to help!";
+      }
+    };
+  }
 })();
