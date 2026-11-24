@@ -451,6 +451,43 @@ async function handleRental(request, env) {
   }
 }
 
+/* POST /api/demo — Demo request from deals page */
+async function handleDemo(request, env) {
+  try {
+    var body = await request.json();
+
+    var emailBody = "New Demo Request from perryequip.com\n\n" +
+      "Machine: " + (body.machine || "Not specified") + "\n" +
+      "Name: " + (body.first_name || "") + " " + (body.last_name || "") + "\n" +
+      "Email: " + (body.email || "") + "\n" +
+      "Phone: " + (body.phone || "") + "\n" +
+      "Company: " + (body.company || "N/A") + "\n" +
+      "City/State: " + (body.city || "") + " " + (body.state || "") + "\n" +
+      "Preferred Date: " + (body.preferred_date || "Not specified") + "\n" +
+      "Notes: " + (body.notes || "None") + "\n";
+
+    await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + env.SENDGRID_API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
+        from: { email: "noreply@perryequip.com", name: "Perry Brothers Demos" },
+        reply_to: { email: body.email || "noreply@perryequip.com", name: (body.first_name || "") + " " + (body.last_name || "") },
+        subject: "Demo Request: " + (body.machine || "Equipment"),
+        content: [{ type: "text/plain", value: emailBody }]
+      })
+    });
+
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    console.log("Demo error: " + err.message);
+    return jsonResponse({ error: "Failed to submit" }, 500);
+  }
+}
+
 /* POST /api/chat/close — Visitor closes chat (send transcript) */
 async function handleChatClose(request, env) {
   try {
@@ -763,6 +800,9 @@ export default {
     }
     if (path === "/api/rental" && method === "POST") {
       return handleRental(request, env);
+    }
+    if (path === "/api/demo" && method === "POST") {
+      return handleDemo(request, env);
     }
     if (path === "/api/chat/close" && method === "POST") {
       return handleChatClose(request, env);

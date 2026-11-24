@@ -448,15 +448,48 @@ gtag('config', 'G-DGVY5FCB2R');
       justify-content: center;
       min-height: 44px;
       padding: 0 16px;
+      border: none;
       border-radius: 10px;
       background: #f4c400;
       color: #111 !important;
       font-size: 14px;
       font-weight: 800;
       text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
       transition: transform 0.18s ease, opacity 0.18s ease;
     }
     .pbe-top-seller-link:hover { transform: translateY(-1px); opacity: 0.96; }
+
+    /* ── Demo Request Panel ── */
+    .demo-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.6); z-index:10000; justify-content:center; align-items:center; }
+    .demo-overlay.open { display:flex; }
+    .demo-panel { width:540px; max-width:95vw; max-height:90vh; background:#fff; overflow-y:auto; border-radius:16px; position:relative; animation:demo-pop .2s ease; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+    @keyframes demo-pop { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .demo-panel-top { background:linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%); padding:36px 28px 28px; border-radius:16px 16px 0 0; position:relative; overflow:hidden; }
+    .demo-panel-top::before { content:''; position:absolute; top:-40%; right:-20%; width:300px; height:300px; background:radial-gradient(circle, rgba(244,196,0,.12) 0%, transparent 70%); pointer-events:none; }
+    .demo-panel-top::after { content:''; position:absolute; bottom:0; left:28px; right:28px; height:3px; background:linear-gradient(90deg, #f4c400, #d91f11); border-radius:3px 3px 0 0; }
+    .demo-panel-kicker { display:inline-block; padding:5px 10px; border-radius:999px; background:rgba(244,196,0,.15); color:#f4c400; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; }
+    .demo-panel-title { font-family:var(--font-display); font-size:28px; font-weight:900; color:#fff; margin:0 0 4px; line-height:1.1; }
+    .demo-panel-title b { color:#f4c400; }
+    .demo-panel-machine { font-size:15px; color:rgba(255,255,255,.55); margin:0; }
+    .demo-panel-close { position:absolute; top:16px; right:16px; background:rgba(255,255,255,.08); border:none; width:32px; height:32px; border-radius:50%; font-size:20px; cursor:pointer; color:rgba(255,255,255,.5); line-height:1; z-index:2; display:flex; align-items:center; justify-content:center; transition:background .15s, color .15s; }
+    .demo-panel-close:hover { background:rgba(255,255,255,.15); color:#fff; }
+    .demo-panel-body { padding:24px 28px 32px; }
+    .demo-section { font-size:12px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.1em; margin:20px 0 10px; }
+    .demo-section:first-child { margin-top:0; }
+    .demo-row { display:flex; gap:10px; margin-bottom:10px; }
+    .demo-row input, .demo-row select, .demo-row textarea { flex:1; padding:11px 14px; border:1px solid #e0e0e0; border-radius:6px; font-size:14px; font-family:inherit; background:#fafafa; transition:border .15s; }
+    .demo-row input:focus, .demo-row select:focus, .demo-row textarea:focus { border-color:var(--red); outline:none; background:#fff; }
+    .demo-row input::placeholder, .demo-row textarea::placeholder { color:#aaa; }
+    .demo-row textarea { resize:vertical; min-height:60px; }
+    .demo-actions { display:flex; gap:10px; margin-top:24px; }
+    .demo-actions .btn-back { flex:0 0 auto; padding:12px 20px; background:#fff; border:1px solid #ddd; border-radius:8px; font-size:14px; cursor:pointer; font-weight:600; }
+    .demo-actions .btn-back:hover { border-color:#333; }
+    .demo-actions .btn-submit { flex:1; padding:12px 20px; background:var(--red); color:#fff; border:none; border-radius:8px; font-size:15px; cursor:pointer; font-weight:700; }
+    .demo-actions .btn-submit:hover { background:#c00; }
+    .demo-success { text-align:center; padding:40px 20px; }
+    .demo-success h2 { color:#28a745; font-family:var(--font-display); }
 
     /* ── Dark breadcrumb ── */
     .breadcrumb {
@@ -488,6 +521,13 @@ gtag('config', 'G-DGVY5FCB2R');
       .pbe-top-seller-model { font-size: 24px; }
       .pbe-top-seller-price { font-size: 30px; }
       .deals-hero-inner h1 { font-size: 42px; }
+      .demo-overlay { align-items:flex-end; }
+      .demo-panel { max-width:100%; max-height:95vh; border-radius:16px 16px 0 0; width:100%; }
+      .demo-panel-top { border-radius:16px 16px 0 0; padding:28px 20px 24px; }
+      .demo-panel-title { font-size:24px; }
+      .demo-panel-body { padding:20px 16px 28px; }
+      .demo-row { flex-wrap:wrap; }
+      .demo-row input, .demo-row textarea { min-width:0; }
     }
     @media (max-width: 640px) {
       .pbe-video-grid { grid-template-columns: 1fr; }
@@ -607,7 +647,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$36,100</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY35+Open+Cab">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY35 Open Cab','SANY SY35 Open Cab Excavator','/images/gallery/sy35-open/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -648,7 +688,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$39,999</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY35+Cab">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY35 Cab','SANY SY35 Cab Excavator','/images/gallery/sy35-cab/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -674,7 +714,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$51,750</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY50+Open+Cab">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY50 Open Cab','SANY SY50 Open Cab Excavator','/images/gallery/sy50-open/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -702,7 +742,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$59,999</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY50+Cab">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY50 Cab','SANY SY50 Cab Excavator','/images/gallery/sy50-cab/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -743,7 +783,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$64,999</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY60">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY60','SANY SY60 Excavator','/images/gallery/sy60/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -771,7 +811,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$94,999</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY80">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY80','SANY SY80 Excavator','/images/gallery/sy80/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -801,7 +841,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$154,000</div>
           <p class="pbe-top-seller-rebate">Comes with 5 Year/5,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+SY215">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('SY215','SANY SY215 Excavator','/images/gallery/sy215c/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -829,7 +869,7 @@ gtag('config', 'G-DGVY5FCB2R');
           <div class="pbe-top-seller-price-label">Starting at</div>
           <div class="pbe-top-seller-price">$64,900</div>
           <p class="pbe-top-seller-rebate">Comes with 3 Year/3,000 Hour Warranty</p>
-          <a class="pbe-top-seller-link" href="/contact/?machine=SANY+Skid+Steer">Lock In Your Price Today</a>
+          <button class="pbe-top-seller-link" onclick="openDemo('Skid Steer','SANY Skid Steer Loader','/images/gallery/skid-steer/01.jpg')">Schedule FREE DEMO</button>
           <p style="text-align:center;font-size:13px;color:#28a745;margin:4px 0 0;font-weight:600;">Next Day Delivery Available</p>
         </div>
       </article>
@@ -955,6 +995,105 @@ document.querySelectorAll('.pbe-video-thumb').forEach(container => {
     }
   });
 });
+
+/* ── Demo Request Panel ── */
+function openDemo(model, fullName, img) {
+  var overlay = document.getElementById('demo-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'demo-overlay';
+    overlay.className = 'demo-overlay';
+    overlay.innerHTML =
+      '<div class="demo-panel">' +
+        '<div class="demo-panel-top" id="demo-machine">' +
+          '<button class="demo-panel-close" onclick="closeDemo()">&times;</button>' +
+        '</div>' +
+        '<div class="demo-panel-body">' +
+          '<p class="demo-section">Your Contact Info</p>' +
+          '<div class="demo-row"><input type="text" id="demo-fname" placeholder="First Name *"><input type="text" id="demo-lname" placeholder="Last Name *"></div>' +
+          '<div class="demo-row"><input type="email" id="demo-email" placeholder="Email *"><input type="tel" id="demo-phone" placeholder="Phone *"></div>' +
+          '<div class="demo-row"><input type="text" id="demo-company" placeholder="Company (optional)"></div>' +
+          '<div class="demo-row"><input type="text" id="demo-city" placeholder="City"><input type="text" id="demo-state" placeholder="State" style="max-width:120px"></div>' +
+          '<p class="demo-section">Demo Details</p>' +
+          '<p style="font-size:13px;font-weight:600;margin:0 0 6px;color:#555;">Preferred Demo Date</p>' +
+          '<div class="demo-row"><input type="date" id="demo-date"></div>' +
+          '<div class="demo-row"><textarea id="demo-notes" placeholder="Anything else we should know? (optional)" rows="2"></textarea></div>' +
+          '<p id="demo-error" style="color:var(--red);font-size:13px;margin:8px 0;display:none;"></p>' +
+          '<div id="demo-form-area" class="demo-actions"><button class="btn-back" onclick="closeDemo()">Cancel</button><button class="btn-submit" onclick="submitDemo()">Schedule My FREE Demo</button></div>' +
+          '<div id="demo-success" class="demo-success" style="display:none;"><h2>Demo Requested!</h2><p style="margin:12px 0;color:#555;">A team member will reach out within 1 business day to confirm your demo — usually within a few hours.</p><p><a href="tel:+12299240035" style="color:var(--red);font-weight:600;">(229) 924-0035</a></p><button class="btn-back" style="margin-top:20px;" onclick="closeDemo()">Close</button></div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeDemo(); });
+  }
+
+  document.getElementById('demo-machine').innerHTML =
+    '<button class="demo-panel-close" onclick="closeDemo()">&times;</button>' +
+    '<span class="demo-panel-kicker">Free · No Obligation</span>' +
+    '<h2 class="demo-panel-title">Schedule a <b>FREE Demo</b></h2>' +
+    '<p class="demo-panel-machine">' + fullName + '</p>';
+  overlay.dataset.machine = 'SANY ' + model;
+
+  document.getElementById('demo-form-area').style.display = 'flex';
+  document.getElementById('demo-success').style.display = 'none';
+  document.getElementById('demo-error').style.display = 'none';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDemo() {
+  var overlay = document.getElementById('demo-overlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitDemo() {
+  var fname = document.getElementById('demo-fname').value.trim();
+  var lname = document.getElementById('demo-lname').value.trim();
+  var email = document.getElementById('demo-email').value.trim();
+  var phone = document.getElementById('demo-phone').value.trim();
+  var err = document.getElementById('demo-error');
+
+  if (!fname || !lname || !email || !phone) {
+    err.textContent = 'Please fill out all required contact fields.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  var overlay = document.getElementById('demo-overlay');
+  var data = {
+    first_name: fname,
+    last_name: lname,
+    email: email,
+    phone: phone,
+    machine: overlay.dataset.machine || '',
+    company: document.getElementById('demo-company').value || '',
+    city: document.getElementById('demo-city').value || '',
+    state: document.getElementById('demo-state').value || '',
+    preferred_date: document.getElementById('demo-date').value || '',
+    notes: document.getElementById('demo-notes').value || ''
+  };
+
+  fetch('https://raspy-cell-4751.lance-74b.workers.dev/api/demo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function(res) {
+    return res.json();
+  }).then(function(result) {
+    if (result.ok) {
+      document.getElementById('demo-form-area').style.display = 'none';
+      document.getElementById('demo-success').style.display = 'block';
+    } else {
+      document.getElementById('demo-error').textContent = 'Something went wrong. Please call us at (229) 924-0035.';
+      document.getElementById('demo-error').style.display = 'block';
+    }
+  }).catch(function() {
+    document.getElementById('demo-error').textContent = 'Something went wrong. Please call us at (229) 924-0035.';
+    document.getElementById('demo-error').style.display = 'block';
+  });
+}
 </script>
 <script src="/js/gallery.js"></script>
 <script src="/js/chat.js"></script>
