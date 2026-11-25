@@ -417,6 +417,9 @@ async function handleChatLead(request, env) {
 async function handleRental(request, env) {
   try {
     var body = await request.json();
+    /* Bot protection: honeypot + timestamp */
+    if (body._hp) return jsonResponse({ ok: true });
+    if (body._ts && body._ts < 3000) return jsonResponse({ ok: true });
     var fullName = (body.first_name || "") + " " + (body.last_name || "");
     var address = [body.address, body.city, body.state, body.zip].filter(Boolean).join(", ");
 
@@ -487,6 +490,9 @@ async function handleRental(request, env) {
 async function handleDemo(request, env) {
   try {
     var body = await request.json();
+    /* Bot protection: honeypot + timestamp */
+    if (body._hp) return jsonResponse({ ok: true });
+    if (body._ts && body._ts < 3000) return jsonResponse({ ok: true });
     var fullName = (body.first_name || "") + " " + (body.last_name || "");
 
     var rows = "";
@@ -494,9 +500,11 @@ async function handleDemo(request, env) {
       if (!value) return;
       rows += '<tr><td style="padding:10px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;width:140px;vertical-align:top;">' + label + '</td><td style="padding:10px 16px;font-size:15px;color:#111;">' + value + '</td></tr>';
     }
+    var prefBadgeColor = body.contact_pref === 'Call' ? '#2563eb' : '#16a34a';
     addRow("Name", fullName);
     addRow("Phone", '<a href="tel:' + (body.phone || "") + '" style="color:#d91f11;text-decoration:none;font-weight:600;">' + (body.phone || "") + '</a>');
     addRow("Zip Code", body.zip);
+    if (body.contact_pref) { addRow("Prefers", '<span style="display:inline-block;padding:3px 12px;border-radius:999px;background:' + prefBadgeColor + ';color:#fff;font-size:12px;font-weight:700;">' + body.contact_pref + '</span>'); }
     addRow("Preferred Date", body.preferred_date);
 
     var htmlBody = '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' +
@@ -517,6 +525,7 @@ async function handleDemo(request, env) {
       "Name: " + fullName + "\n" +
       "Phone: " + (body.phone || "") + "\n" +
       "Zip Code: " + (body.zip || "") + "\n" +
+      "Prefers: " + (body.contact_pref || "N/A") + "\n" +
       "Preferred Date: " + (body.preferred_date || "Not specified") + "\n";
 
     await fetch("https://api.sendgrid.com/v3/mail/send", {

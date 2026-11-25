@@ -760,6 +760,7 @@ function openRental(model, type, img) {
           '<button class="rent-panel-close" onclick="closeRental()">&times;</button>' +
         '</div>' +
         '<div class="rent-panel-body">' +
+          '<input type="text" id="rent-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;">' +
           '<p class="rent-section">Your Details</p>' +
           '<div class="rent-row"><input type="text" id="rent-fname" placeholder="First Name *"><input type="text" id="rent-lname" placeholder="Last Name *"></div>' +
           '<div class="rent-row"><input type="email" id="rent-email" placeholder="Email *"><input type="tel" id="rent-phone" placeholder="Phone *"></div>' +
@@ -800,6 +801,7 @@ function openRental(model, type, img) {
   document.getElementById('rent-form-area').style.display = 'flex';
   document.getElementById('rent-success').style.display = 'none';
   document.getElementById('rent-error').style.display = 'none';
+  overlay.dataset.openedAt = Date.now();
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -827,9 +829,13 @@ function submitRental() {
     err.style.display = 'block';
     return;
   }
+  /* Bot checks */
+  if (document.getElementById('rent-website').value) { return; }
+  var overlay = document.getElementById('rent-overlay');
+  var elapsed = Date.now() - (parseInt(overlay.dataset.openedAt) || 0);
+  if (elapsed < 3000) { return; }
   err.style.display = 'none';
 
-  var overlay = document.getElementById('rent-overlay');
   var durEl = document.querySelector('input[name="rent-dur"]:checked');
 
   var data = {
@@ -845,7 +851,9 @@ function submitRental() {
     zip: document.getElementById('rent-zip').value || '',
     delivery: document.getElementById('rent-delivery').checked,
     start_date: document.getElementById('rent-start').value || '',
-    duration: durEl ? durEl.value : ''
+    duration: durEl ? durEl.value : '',
+    _hp: document.getElementById('rent-website').value,
+    _ts: elapsed
   };
 
   fetch('https://raspy-cell-4751.lance-74b.workers.dev/api/rental', {

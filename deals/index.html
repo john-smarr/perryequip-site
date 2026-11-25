@@ -479,6 +479,11 @@ gtag('config', 'G-DGVY5FCB2R');
     .demo-row input:focus, .demo-row select:focus, .demo-row textarea:focus { border-color:var(--red); outline:none; background:#fff; }
     .demo-row input::placeholder, .demo-row textarea::placeholder { color:#aaa; }
     .demo-row textarea { resize:vertical; min-height:60px; }
+    .demo-pref { display:flex; gap:12px; margin:4px 0 8px; }
+    .demo-pref label { display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 16px; border:1px solid #e0e0e0; border-radius:20px; font-size:14px; font-weight:600; transition:all .15s; }
+    .demo-pref label:hover { border-color:#999; }
+    .demo-pref label:has(input:checked) { border-color:var(--red); background:var(--red); color:#fff; }
+    .demo-pref input[type="radio"] { display:none; }
     .demo-actions { display:flex; gap:10px; margin-top:24px; }
     .demo-actions .btn-back { flex:0 0 auto; padding:12px 20px; background:#fff; border:1px solid #ddd; border-radius:8px; font-size:14px; cursor:pointer; font-weight:600; }
     .demo-actions .btn-back:hover { border-color:#333; }
@@ -1004,8 +1009,11 @@ function openDemo(model, fullName, img) {
           '<button class="demo-panel-close" onclick="closeDemo()">&times;</button>' +
         '</div>' +
         '<div class="demo-panel-body">' +
+          '<input type="text" id="demo-website" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;">' +
           '<div class="demo-row"><input type="text" id="demo-fname" placeholder="First Name *"><input type="text" id="demo-lname" placeholder="Last Name *"></div>' +
           '<div class="demo-row"><input type="tel" id="demo-phone" placeholder="Phone *"><input type="text" id="demo-zip" placeholder="Zip Code *" style="max-width:120px"></div>' +
+          '<p style="font-size:13px;font-weight:600;margin:14px 0 6px;color:#555;">Preferred Communication</p>' +
+          '<div class="demo-pref"><label><input type="radio" name="demo-pref" value="Text" checked><span>Text</span></label><label><input type="radio" name="demo-pref" value="Call"><span>Call</span></label></div>' +
           '<p style="font-size:13px;font-weight:600;margin:14px 0 6px;color:#555;">Preferred Demo Date</p>' +
           '<div class="demo-row"><input type="date" id="demo-date"></div>' +
           '<p id="demo-error" style="color:var(--red);font-size:13px;margin:8px 0;display:none;"></p>' +
@@ -1026,6 +1034,7 @@ function openDemo(model, fullName, img) {
   document.getElementById('demo-form-area').style.display = 'flex';
   document.getElementById('demo-success').style.display = 'none';
   document.getElementById('demo-error').style.display = 'none';
+  overlay.dataset.openedAt = Date.now();
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1048,16 +1057,24 @@ function submitDemo() {
     err.style.display = 'block';
     return;
   }
+  /* Bot checks */
+  if (document.getElementById('demo-website').value) { return; }
+  var overlay = document.getElementById('demo-overlay');
+  var elapsed = Date.now() - (parseInt(overlay.dataset.openedAt) || 0);
+  if (elapsed < 3000) { return; }
   err.style.display = 'none';
 
-  var overlay = document.getElementById('demo-overlay');
+  var prefEl = document.querySelector('input[name="demo-pref"]:checked');
   var data = {
     first_name: fname,
     last_name: lname,
     phone: phone,
     zip: zip,
+    contact_pref: prefEl ? prefEl.value : 'Text',
     machine: overlay.dataset.machine || '',
-    preferred_date: document.getElementById('demo-date').value || ''
+    preferred_date: document.getElementById('demo-date').value || '',
+    _hp: document.getElementById('demo-website').value,
+    _ts: elapsed
   };
 
   fetch('https://raspy-cell-4751.lance-74b.workers.dev/api/demo', {
