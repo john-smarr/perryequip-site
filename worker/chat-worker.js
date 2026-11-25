@@ -468,7 +468,7 @@ async function handleRental(request, env) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
+        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }, { email: "brandensmith@perryequip.com" }] }],
         from: { email: "noreply@perryequip.com", name: "Perry Brothers Rentals" },
         reply_to: body.email ? { email: body.email, name: fullName } : undefined,
         subject: "Rental Request: " + (body.machine || "Equipment"),
@@ -535,7 +535,7 @@ async function handleDemo(request, env) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }] }],
+        personalizations: [{ to: [{ email: "johnsmarr@perrybrothersoil.com" }, { email: "stephen@perrybrothersoil.com" }] }],
         from: { email: "noreply@perryequip.com", name: "Perry Brothers Demos" },
         subject: "Demo Request: " + (body.machine || "Equipment"),
         content: [
