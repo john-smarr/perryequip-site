@@ -136,7 +136,10 @@ section{padding:80px 24px}
 .faq-item{border-bottom:1px solid #ddd}
 .faq-question{width:100%;background:none;border:none;text-align:left;padding:20px 0;font-family:var(--font-body);font-size:16px;font-weight:600;color:var(--black);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .faq-question:hover{color:var(--red)}
-.faq-icon{width:24px;height:24px;flex-shrink:0;border-radius:50%;background:var(--black);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;transition:background .2s,transform .2s}
+.faq-icon{width:24px;height:24px;flex-shrink:0;border-radius:50%;background:var(--black);color:var(--white);font-size:0;position:relative;transition:background .2s,transform .2s}
+.faq-icon::before,.faq-icon::after{content:'';position:absolute;background:#fff;border-radius:1px;top:50%;left:50%;transform:translate(-50%,-50%)}
+.faq-icon::before{width:12px;height:2px}
+.faq-icon::after{width:2px;height:12px}
 .faq-item.open .faq-icon{background:var(--red);transform:rotate(45deg)}
 .faq-answer{font-size:15px;color:#555;line-height:1.7;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
 .faq-item.open .faq-answer{max-height:200px;padding-bottom:20px}
